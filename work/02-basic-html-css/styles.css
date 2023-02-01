@@ -1,0 +1,19 @@
+*, *::after, *::before {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+header,
+footer {
+	background-color: aquamarine;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+}
+
+main {
+    background-color: bisque;
+}
