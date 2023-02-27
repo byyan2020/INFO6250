@@ -1,0 +1,105 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+}
+
+.container {
+	max-width: 60rem;
+	margin: 0 auto;
+	padding: 1rem;
+}
+
+h1 {
+	font-size: 2rem;
+	font-weight: bold;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+
+h2 {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+}
+
+.valid-word {
+	margin-top: 2rem;
+}
+
+.valid-word ul {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+
+	list-style: none;
+	list-style-position: outside;
+
+	padding-left: 0;
+}
+
+.previous-guess {
+	margin-top: 2rem;
+}
+
+.previous-guess ul {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+
+	list-style: none;
+	list-style-position: outside;
+
+	padding-left: 0;
+}
+
+.guess-info {
+	margin-top: 2rem;
+}
+
+.guess-form {
+	display: grid;
+	grid-template-columns: 3fr 1fr;
+	gap: 2rem;
+}
+
+form {
+	margin-top: 2rem;
+}
+
+.form-label {
+	display: block;
+	margin-bottom: 1rem;
+}
+
+.form-input {
+	width: 100%;
+	padding: 1rem;
+	font-size: 1rem;
+	border: 1px solid #ccc;
+}
+
+.form-btn {
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	padding: 1rem 1rem;
+	font-size: 1rem;
+	border-radius: 5px;
+	cursor: pointer;
+	margin-top: 1rem;
+}
+
+.form-btn:hover {
+	background-color: #3e8e41;
+}
+
+.button-group {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+}
+
+.alert {
+	color: red;
+	font-weight: bold;
+	font-size: 2rem;
+}
