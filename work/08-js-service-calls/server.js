@@ -81,7 +81,7 @@ app.get('/api/word', (req, res) => {
   }
 
   const storedWord = users.wordFor[username] || "";
-
+  
   res.json({ username, storedWord });
 });
 

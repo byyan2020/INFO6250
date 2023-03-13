@@ -11,6 +11,21 @@
 //
 // You can add to this file and use this function
 // or write your own files/functions
+export function fetchSession() {
+    return fetch('/api/session', {
+        method: "GET",
+    })
+    .catch(() => Promise.reject({ error: "networkError" }))
+    .then( response => {
+        if (response.ok) {
+            return response.json()
+        }
+        return response.json()
+        .catch( error => Promise.reject({ error }) )
+        .then( err => Promise.reject(err) )
+    })
+}
+
 
 export function fetchLogin(username) {
   return fetch('/api/session/', {
@@ -32,6 +47,49 @@ export function fetchLogin(username) {
     }
     return response.json(); // happy status code means resolve with data from service
   });
+}
+
+export function fetchLogout() {
+    return fetch('/api/session', {
+        method: 'DELETE',
+    })
+    .catch( err => Promise.reject({ error: 'netword-error' }))
+    .then( response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err))
+        }
+        return response.json();
+    })
+}
+
+export function fetchWord() {
+    return fetch('/api/word', {
+        method: "GET",
+    })
+    .catch(() => Promise.reject({ error: "networkError" }))
+    .then( response => {
+        if(!response.ok) {  
+            return response.json().then( err => Promise.reject(err) );
+          }
+          return response.json();
+    })  
+}
+
+export function fetchPostWord(word) {
+    return fetch('/api/word', {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify({ word }),
+    })
+    .catch( err => Promise.reject({ error: "networkError" }))
+    .then( response => {
+        if (!response.ok) {
+            return response.json().then( err => Promise.reject(err) );
+        }
+        return response.json();
+    })
 }
 
 
