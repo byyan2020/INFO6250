@@ -1,0 +1,81 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+:root {
+	--color-primary: #4a6552;
+	--color-extra: #b0ba72;
+	--color-dark: #3b4a3f;
+	--color-light: #f5f3f4;
+	--color-contrast: #cc3636;
+}
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+
+	font-family: sans-serif;
+
+    background-color: #f5f3f4;
+}
+
+#app {
+    min-height: 100vh;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+.login form,
+.word {
+    padding: 3rem;
+    
+	display: flex;
+	flex-direction: column;
+    gap: 3rem;
+
+    background-color: #4a6552;
+    color: white;
+}
+
+.logout-btn {
+    border: 0;
+    background-color:#f5f3f4;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.logout-btn:hover {
+    color: #cc3636;
+    transform: scale(1.2);
+}
+
+
+.store-info {
+    font-weight: bold;
+    padding: 3rem;
+    background-color: #3b4a3f;
+    color: white;
+}
+
+
+.form-btn {
+	background-color: var(--color-extra);
+	color: white;
+
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	border: var(--color-extra);
+
+	font-weight: bold;
+}
+
+
+.error {
+	background-color: brown;
+	color: white;
+}
