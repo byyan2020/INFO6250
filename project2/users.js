@@ -15,7 +15,6 @@ function isValid(username) {
 
 function registerUser(username) {
 	users[username] = username;
-	console.log({users});
 }
 
 module.exports = {

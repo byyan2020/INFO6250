@@ -1,22 +1,17 @@
 export function fetchLogin(username) {
-  console.log("call fetchLogin")
-	return fetch("/api/v1/session/", {
+	return fetch("/api/v1/session", {
 		method: "POST",
-		headers: {
+		headers: new Headers({
 			"content-type": "application/json",
-		},
+		}),
 		body: JSON.stringify({ username }),
 	})
-		.catch((err) => Promise.reject({ error: "network-error" }))
+		.catch(() => Promise.reject({ error: "network-error" }))
 		.then((response) => {
 			if (!response.ok) {
 				return response.json().then((err) => Promise.reject(err));
 			}
-      console.log("return value of fetchLogin:", response.json())
-			return response
-				.json()
-				.catch((error) => Promise.reject({ error }))
-				.then((err) => Promise.reject(err));
+			return response.json();
 		});
 }
 

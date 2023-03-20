@@ -5,7 +5,6 @@ let loginUsers = {
 
 function addLoginUsers(username) {
 	loginUsers[username] = username;
-  console.log({loginUsers})
 }
 
 function getLoginUsers() {

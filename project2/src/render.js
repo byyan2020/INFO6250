@@ -1,13 +1,25 @@
-export default function render({ state, appEl }) {
+export function renderApp({ state, appEl}) {
 	const html = `
+    ${getErrorHtml(state)}
     ${getLoginHtml(state)}
     ${getLogoutHtml(state)}
     ${getOutgoingHtml(state)}
+    `;
+	appEl.innerHTML = html;
+}
+
+export function renderChat({ state, chatEl }) {
+	const html = `
     ${getUserList(state)}
     ${getMessageList(state)}
     `;
+	chatEl.innerHTML = html;
+}
 
-	appEl.innerHTML = html;
+function getErrorHtml( state ) {
+  return `
+      <div class="status">${state.error}</div>
+  `;
 }
 
 function getLoginHtml(state) {
@@ -55,13 +67,13 @@ function getOutgoingHtml(state) {
 }
 
 function getMessageList(state) {
-  if (!state.isLoggedIn) {
+	if (!state.isLoggedIn) {
 		return "";
 	}
 	const { messages } = state;
-  if (!messages) {
-    return "";
-  }
+	if (!messages) {
+		return "";
+	}
 	return (
 		`<ol class="messages">` +
 		messages
@@ -84,7 +96,7 @@ function getMessageList(state) {
 }
 
 function getUserList(state) {
-  if (!state.isLoggedIn) {
+	if (!state.isLoggedIn) {
 		return "";
 	}
 	return (

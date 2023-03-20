@@ -19,25 +19,17 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// Constants benefits
-// - reduces risk of typos (IDE can code-complete)
-// - easier to confirm it is correct (easier to check properties than strings)
-// - If a value changes, you can change it in one place and the rest of the code can continue to use the constant
-
-// Might be SERVER_CODES and CLIENT_CODES if we had more and different constants
 var SERVER = {
   AUTH_MISSING: 'auth-missing',
   AUTH_INSUFFICIENT: 'auth-insufficient',
   REQUIRED_USERNAME: 'required-username',
-  REQUIRED_TASK: 'required-task',
-  TASK_MISSING: 'noSuchId' // Someone was inconsistent!
+  REQUIRED_MESSAGE: 'required-message'
 };
-
 var CLIENT = {
   NETWORK_ERROR: 'networkError',
   NO_SESSION: 'noSession'
 };
-var MESSAGES = (_MESSAGES = {}, _defineProperty(_MESSAGES, CLIENT.NETWORK_ERROR, 'Trouble connecting to the network.  Please try again'), _defineProperty(_MESSAGES, SERVER.AUTH_INSUFFICIENT, 'Your username/password combination does not match any records, please try again.'), _defineProperty(_MESSAGES, SERVER.REQUIRED_USERNAME, 'Please enter a valid (letters and/or numbers) username'), _defineProperty(_MESSAGES, SERVER.REQUIRED_TASK, 'Please enter the task to do'), _defineProperty(_MESSAGES, "default", 'Something went wrong.  Please try again'), _MESSAGES);
+var MESSAGES = (_MESSAGES = {}, _defineProperty(_MESSAGES, CLIENT.NETWORK_ERROR, 'Trouble connecting to the network.  Please try again'), _defineProperty(_MESSAGES, SERVER.AUTH_INSUFFICIENT, 'Your username/password combination does not match any records, please try again.'), _defineProperty(_MESSAGES, SERVER.REQUIRED_USERNAME, 'Please enter a valid (letters and/or numbers) username'), _defineProperty(_MESSAGES, SERVER.REQUIRED_MESSAGE, 'Please enter message to send'), _defineProperty(_MESSAGES, "default", 'Something went wrong.  Please try again'), _MESSAGES);
 
 /***/ }),
 
@@ -61,7 +53,8 @@ __webpack_require__.r(__webpack_exports__);
 
 function addLoginListener(_ref) {
   var state = _ref.state,
-    appEl = _ref.appEl;
+    appEl = _ref.appEl,
+    chatEl = _ref.chatEl;
   appEl.addEventListener("submit", function (e) {
     e.preventDefault();
     if (!e.target.classList.contains("login-form")) {
@@ -72,32 +65,28 @@ function addLoginListener(_ref) {
     (0,_services__WEBPACK_IMPORTED_MODULE_0__.fetchLogin)(username).then(function (users) {
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.login)(username);
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.setLoginUsers)(users);
-      (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
         state: state,
         appEl: appEl
+      });
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderChat)({
+        state: state,
+        chatEl: chatEl
       });
       return (0,_services__WEBPACK_IMPORTED_MODULE_0__.fetchMessages)();
     })["catch"](function (err) {
-      (0,_state__WEBPACK_IMPORTED_MODULE_2__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
-      (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
-        state: state,
-        appEl: appEl
-      });
+      return Promise.reject(err);
     })
     // Fetch all messages
     .then(function (messages) {
-      (0,_state__WEBPACK_IMPORTED_MODULE_2__.login)(username);
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.setMessages)(messages);
-      console.log("After fetch messages: ", {
-        state: state
-      });
-      (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderChat)({
         state: state,
-        appEl: appEl
+        chatEl: chatEl
       });
     })["catch"](function (err) {
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
-      (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
         state: state,
         appEl: appEl
       });
@@ -106,20 +95,25 @@ function addLoginListener(_ref) {
 }
 function addLogoutListener(_ref2) {
   var state = _ref2.state,
-    appEl = _ref2.appEl;
+    appEl = _ref2.appEl,
+    chatEl = _ref2.chatEl;
   appEl.addEventListener("submit", function (e) {
     e.preventDefault();
     if (!e.target.classList.contains("logout-form")) {
       return;
     }
     (0,_state__WEBPACK_IMPORTED_MODULE_2__.logout)();
-    (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
+    (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
       state: state,
       appEl: appEl
     });
+    (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderChat)({
+      state: state,
+      chatEl: chatEl
+    });
     (0,_services__WEBPACK_IMPORTED_MODULE_0__.fetchLogout)()["catch"](function (err) {
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
-      (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
         state: state,
         appEl: appEl
       });
@@ -128,7 +122,8 @@ function addLogoutListener(_ref2) {
 }
 function addPostMessageListener(_ref3) {
   var state = _ref3.state,
-    appEl = _ref3.appEl;
+    appEl = _ref3.appEl,
+    chatEl = _ref3.chatEl;
   appEl.addEventListener("submit", function (e) {
     if (!e.target.classList.contains("chat-form")) {
       return;
@@ -136,14 +131,18 @@ function addPostMessageListener(_ref3) {
     var message = appEl.querySelector(".message").value;
     (0,_services__WEBPACK_IMPORTED_MODULE_0__.fetchPostMessage)(message).then(function (messages) {
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.setMessages)(messages);
-      (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
         state: state,
         appEl: appEl
+      });
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderChat)({
+        state: state,
+        chatEl: chatEl
       });
     })["catch"](function (err) {
       console.log(err);
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR"); // Ensure that the error ends up truthy
-      (0,_render__WEBPACK_IMPORTED_MODULE_1__["default"])({
+      (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
         state: state,
         appEl: appEl
       });
@@ -161,13 +160,23 @@ function addPostMessageListener(_ref3) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ render)
+/* harmony export */   "renderApp": () => (/* binding */ renderApp),
+/* harmony export */   "renderChat": () => (/* binding */ renderChat)
 /* harmony export */ });
-function render(_ref) {
+function renderApp(_ref) {
   var state = _ref.state,
     appEl = _ref.appEl;
-  var html = "\n    ".concat(getLoginHtml(state), "\n    ").concat(getLogoutHtml(state), "\n    ").concat(getOutgoingHtml(state), "\n    ").concat(getUserList(state), "\n    ").concat(getMessageList(state), "\n    ");
+  var html = "\n    ".concat(getErrorHtml(state), "\n    ").concat(getLoginHtml(state), "\n    ").concat(getLogoutHtml(state), "\n    ").concat(getOutgoingHtml(state), "\n    ");
   appEl.innerHTML = html;
+}
+function renderChat(_ref2) {
+  var state = _ref2.state,
+    chatEl = _ref2.chatEl;
+  var html = "\n    ".concat(getUserList(state), "\n    ").concat(getMessageList(state), "\n    ");
+  chatEl.innerHTML = html;
+}
+function getErrorHtml(state) {
+  return "\n      <div class=\"status\">".concat(state.error, "</div>\n  ");
 }
 function getLoginHtml(state) {
   if (state.isLoggedIn) {
@@ -226,16 +235,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "fetchSession": () => (/* binding */ fetchSession)
 /* harmony export */ });
 function fetchLogin(username) {
-  console.log("call fetchLogin");
-  return fetch("/api/v1/session/", {
+  return fetch("/api/v1/session", {
     method: "POST",
-    headers: {
+    headers: new Headers({
       "content-type": "application/json"
-    },
+    }),
     body: JSON.stringify({
       username: username
     })
-  })["catch"](function (err) {
+  })["catch"](function () {
     return Promise.reject({
       error: "network-error"
     });
@@ -245,14 +253,7 @@ function fetchLogin(username) {
         return Promise.reject(err);
       });
     }
-    console.log("return value of fetchLogin:", response.json());
-    return response.json()["catch"](function (error) {
-      return Promise.reject({
-        error: error
-      });
-    }).then(function (err) {
-      return Promise.reject(err);
-    });
+    return response.json();
   });
 }
 function fetchLogout() {
@@ -369,12 +370,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "logout": () => (/* binding */ logout),
 /* harmony export */   "setError": () => (/* binding */ setError),
 /* harmony export */   "setLoginUsers": () => (/* binding */ setLoginUsers),
-/* harmony export */   "setMessages": () => (/* binding */ setMessages)
+/* harmony export */   "setMessages": () => (/* binding */ setMessages),
+/* harmony export */   "waitOnLogin": () => (/* binding */ waitOnLogin)
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
 
 var state = {
   isLoggedIn: false,
+  isLoginPending: true,
   username: "",
   error: "",
   users: {
@@ -386,8 +389,15 @@ var state = {
     // { sender: "Bao", text: "Good" },
   ]
 };
+function waitOnLogin() {
+  state.isLoggedIn = false;
+  state.isLoginPending = true;
+  state.username = '';
+  state.users = {};
+  state.messages = [];
+  state.error = '';
+}
 function login(username) {
-  console.log("login called");
   state.isLoggedIn = true;
   state.username = username;
   state.error = "";
@@ -399,12 +409,18 @@ function logout() {
 }
 function setLoginUsers(data) {
   state.users = data;
+  state.error = "";
 }
 function setMessages(data) {
   state.messages = data;
+  state.error = "";
 }
 function setError(error) {
-  state.error = _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGES;
+  if (!error) {
+    state.error = '';
+    return;
+  }
+  state.error = _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGES[error] || _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGES["default"];
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (state);
 
@@ -483,25 +499,80 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var appEl = document.querySelector('#app');
-(0,_render__WEBPACK_IMPORTED_MODULE_0__["default"])({
+var appEl = document.querySelector("#app");
+var chatEl = document.querySelector("#chat");
+(0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
   state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
   appEl: appEl
+});
+(0,_render__WEBPACK_IMPORTED_MODULE_0__.renderChat)({
+  state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
+  chatEl: chatEl
 });
 (0,_listeners__WEBPACK_IMPORTED_MODULE_2__.addLoginListener)({
   state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
-  appEl: appEl
+  appEl: appEl,
+  chatEl: chatEl
 });
 (0,_listeners__WEBPACK_IMPORTED_MODULE_2__.addLogoutListener)({
   state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
-  appEl: appEl
+  appEl: appEl,
+  chatEl: chatEl
+});
+(0,_listeners__WEBPACK_IMPORTED_MODULE_2__.addPostMessageListener)({
+  state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
+  appEl: appEl,
+  chatEl: chatEl
 });
 checkForSession();
+pollData();
+
+// Polling
+function pollData() {
+  refreshData();
+  setTimeout(pollData, 5000);
+}
+function refreshData() {
+  if (!_state__WEBPACK_IMPORTED_MODULE_1__["default"].isLoggedIn) {
+    return;
+  }
+  (0,_services__WEBPACK_IMPORTED_MODULE_4__.fetchLoginUsers)().then(function (users) {
+    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setLoginUsers)(users);
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderChat)({
+      state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
+      chatEl: chatEl
+    });
+    return (0,_services__WEBPACK_IMPORTED_MODULE_4__.fetchMessages)();
+  })["catch"](function (err) {
+    if ((err === null || err === void 0 ? void 0 : err.error) === _constants__WEBPACK_IMPORTED_MODULE_3__.SERVER.AUTH_MISSING) {
+      return Promise.reject({
+        error: _constants__WEBPACK_IMPORTED_MODULE_3__.CLIENT.NO_SESSION
+      });
+    }
+    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
+      state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
+      appEl: appEl
+    });
+  }).then(function (messages) {
+    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setMessages)(messages);
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderChat)({
+      state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
+      chatEl: chatEl
+    });
+  })["catch"](function (err) {
+    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
+      state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
+      appEl: appEl
+    });
+  });
+}
 function checkForSession() {
   // Fetch current user
   (0,_services__WEBPACK_IMPORTED_MODULE_4__.fetchSession)().then(function (session) {
     (0,_state__WEBPACK_IMPORTED_MODULE_1__.login)(session.username);
-    (0,_render__WEBPACK_IMPORTED_MODULE_0__["default"])({
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
       state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
       appEl: appEl
     });
@@ -517,22 +588,22 @@ function checkForSession() {
   // Fetch login users
   .then(function (users) {
     (0,_state__WEBPACK_IMPORTED_MODULE_1__.setLoginUsers)(users);
-    (0,_render__WEBPACK_IMPORTED_MODULE_0__["default"])({
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderChat)({
       state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
-      appEl: appEl
+      chatEl: chatEl
     });
     return (0,_services__WEBPACK_IMPORTED_MODULE_4__.fetchMessages)();
   })["catch"](function (err) {
     if ((err === null || err === void 0 ? void 0 : err.error) == _constants__WEBPACK_IMPORTED_MODULE_3__.CLIENT.NO_SESSION) {
       (0,_state__WEBPACK_IMPORTED_MODULE_1__.logout)();
-      (0,_render__WEBPACK_IMPORTED_MODULE_0__["default"])({
+      (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
         state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
         appEl: appEl
       });
       return;
     }
-    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setError)((err === null || err === void 0 ? void 0 : err.error) || 'ERROR');
-    (0,_render__WEBPACK_IMPORTED_MODULE_0__["default"])({
+    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
       state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
       appEl: appEl
     });
@@ -540,13 +611,13 @@ function checkForSession() {
   // Fetch all messages
   .then(function (messages) {
     (0,_state__WEBPACK_IMPORTED_MODULE_1__.setMessages)(messages);
-    (0,_render__WEBPACK_IMPORTED_MODULE_0__["default"])({
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderChat)({
       state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
-      appEl: appEl
+      chatEl: chatEl
     });
   })["catch"](function (err) {
-    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setError)((err === null || err === void 0 ? void 0 : err.error) || 'ERROR');
-    (0,_render__WEBPACK_IMPORTED_MODULE_0__["default"])({
+    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
+    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
       state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
       appEl: appEl
     });

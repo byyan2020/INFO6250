@@ -97,6 +97,10 @@ app.post("/api/v1/messages", (req, res) => {
   }
 
   const message = req.body.message.trim();
+  if (!message) {
+    res.status(400).json({ error: "required-message" })
+    return
+  }
   const record = {
     sender: username,
     text: message
