@@ -1,9 +1,12 @@
 export function renderApp({ state, appEl}) {
 	const html = `
     ${getErrorHtml(state)}
+    <div class="login-info">
     ${getLoginHtml(state)}
     ${getLogoutHtml(state)}
+    </div>
     ${getOutgoingHtml(state)}
+    ${getLoadingHtml(state)}
     `;
 	appEl.innerHTML = html;
 }
@@ -17,14 +20,31 @@ export function renderChat({ state, chatEl }) {
 }
 
 function getErrorHtml( state ) {
+  if (!state.error) {
+		return "";
+	}
   return `
-      <div class="status">${state.error}</div>
+      <div class="error">${state.error}</div>
   `;
 }
 
+function getLoadingHtml( state ) {
+  if (state.isChatPending) {
+    return `
+    <div class="waiting">Loading Chat...</div>
+  `
+  }
+  return ``
+}
+
 function getLoginHtml(state) {
+  if(state.isLoginPending) {
+    return `
+      <div class="waiting">Loading user...</div>
+    `
+  }
 	if (state.isLoggedIn) {
-		return state.username;
+		return `<div class="login-user">${state.username}</div>`;
 	}
 	return `
     <div class="login">
@@ -70,12 +90,19 @@ function getMessageList(state) {
 	if (!state.isLoggedIn) {
 		return "";
 	}
+  if (state.isLoginPending) {
+    return `
+    <div class="waiting">Loading Messages...</div>
+  `
+  }
 	const { messages } = state;
 	if (!messages) {
 		return "";
 	}
 	return (
-		`<ol class="messages">` +
+		`<ol class="messages">
+    <h1>Messages</h2>
+    ` +
 		messages
 			.map(
 				(message) => `
@@ -100,13 +127,17 @@ function getUserList(state) {
 		return "";
 	}
 	return (
-		`<ul class="users">` +
+		`
+    <ul class="users">
+    <h1>Current Login Users</h2>
+    ` +
 		Object.values(state.users)
 			.map(
 				(user) => `
             <li>
                 <div class="user">
-                <span class="username">${user}</span>
+                  <img class="avatar" alt="avatar of ${user}" src="http://placekitten.com/150/150"/>
+                  <span class="username">${user}</span>
                 </div>
             </li>
             `

@@ -61,6 +61,11 @@ function addLoginListener(_ref) {
       return;
     }
     var username = appEl.querySelector(".login-username").value;
+    (0,_state__WEBPACK_IMPORTED_MODULE_2__.waitOnChat)();
+    (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
+      state: state,
+      appEl: appEl
+    });
     // Service call to login
     (0,_services__WEBPACK_IMPORTED_MODULE_0__.fetchLogin)(username).then(function (users) {
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.login)(username);
@@ -85,6 +90,7 @@ function addLoginListener(_ref) {
         chatEl: chatEl
       });
     })["catch"](function (err) {
+      (0,_state__WEBPACK_IMPORTED_MODULE_2__.logout)();
       (0,_state__WEBPACK_IMPORTED_MODULE_2__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
       (0,_render__WEBPACK_IMPORTED_MODULE_1__.renderApp)({
         state: state,
@@ -166,7 +172,7 @@ __webpack_require__.r(__webpack_exports__);
 function renderApp(_ref) {
   var state = _ref.state,
     appEl = _ref.appEl;
-  var html = "\n    ".concat(getErrorHtml(state), "\n    ").concat(getLoginHtml(state), "\n    ").concat(getLogoutHtml(state), "\n    ").concat(getOutgoingHtml(state), "\n    ");
+  var html = "\n    ".concat(getErrorHtml(state), "\n    <div class=\"login-info\">\n    ").concat(getLoginHtml(state), "\n    ").concat(getLogoutHtml(state), "\n    </div>\n    ").concat(getOutgoingHtml(state), "\n    ").concat(getLoadingHtml(state), "\n    ");
   appEl.innerHTML = html;
 }
 function renderChat(_ref2) {
@@ -176,11 +182,23 @@ function renderChat(_ref2) {
   chatEl.innerHTML = html;
 }
 function getErrorHtml(state) {
-  return "\n      <div class=\"status\">".concat(state.error, "</div>\n  ");
+  if (!state.error) {
+    return "";
+  }
+  return "\n      <div class=\"error\">".concat(state.error, "</div>\n  ");
+}
+function getLoadingHtml(state) {
+  if (state.isChatPending) {
+    return "\n    <div class=\"waiting\">Loading Chat...</div>\n  ";
+  }
+  return "";
 }
 function getLoginHtml(state) {
+  if (state.isLoginPending) {
+    return "\n      <div class=\"waiting\">Loading user...</div>\n    ";
+  }
   if (state.isLoggedIn) {
-    return state.username;
+    return "<div class=\"login-user\">".concat(state.username, "</div>");
   }
   return "\n    <div class=\"login\">\n        <form class=\"login-form\" action=\"#/login\">\n            <label class=\"form-label\">\n                <span>Username:</span>\n                <input class=\"login-username\" name=\"username\"/>\n            </label>\n            <button type=\"submit\" class=\"form-btn\">Submit</button>\n        </form>\n    </div>\n    ";
 }
@@ -200,11 +218,14 @@ function getMessageList(state) {
   if (!state.isLoggedIn) {
     return "";
   }
+  if (state.isLoginPending) {
+    return "\n    <div class=\"waiting\">Loading Messages...</div>\n  ";
+  }
   var messages = state.messages;
   if (!messages) {
     return "";
   }
-  return "<ol class=\"messages\">" + messages.map(function (message) {
+  return "<ol class=\"messages\">\n    <h1>Messages</h2>\n    " + messages.map(function (message) {
     return "\n        <li>\n          <div class=\"message\">\n            <div class=\"sender-info\">\n                <img class=\"avatar\" alt=\"avatar of ".concat(message.sender, "\" src=\"http://placekitten.com/150/150\"/>\n                <span class=\"username\">").concat(message.sender, "</span>\n            </div>\n            <p class=\"message-text\">").concat(message.text, "</p>\n          </div>\n        </li>\n      ");
   }).join("") + "</ol>";
 }
@@ -212,8 +233,8 @@ function getUserList(state) {
   if (!state.isLoggedIn) {
     return "";
   }
-  return "<ul class=\"users\">" + Object.values(state.users).map(function (user) {
-    return "\n            <li>\n                <div class=\"user\">\n                <span class=\"username\">".concat(user, "</span>\n                </div>\n            </li>\n            ");
+  return "\n    <ul class=\"users\">\n    <h1>Current Login Users</h2>\n    " + Object.values(state.users).map(function (user) {
+    return "\n            <li>\n                <div class=\"user\">\n                  <img class=\"avatar\" alt=\"avatar of ".concat(user, "\" src=\"http://placekitten.com/150/150\"/>\n                  <span class=\"username\">").concat(user, "</span>\n                </div>\n            </li>\n            ");
   }).join("") + "</ul>";
 }
 
@@ -371,13 +392,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "setError": () => (/* binding */ setError),
 /* harmony export */   "setLoginUsers": () => (/* binding */ setLoginUsers),
 /* harmony export */   "setMessages": () => (/* binding */ setMessages),
+/* harmony export */   "waitOnChat": () => (/* binding */ waitOnChat),
 /* harmony export */   "waitOnLogin": () => (/* binding */ waitOnLogin)
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
 
 var state = {
   isLoggedIn: false,
-  isLoginPending: true,
+  isLoginPending: false,
+  isChatPending: false,
   username: "",
   error: "",
   users: {
@@ -399,19 +422,29 @@ function waitOnLogin() {
 }
 function login(username) {
   state.isLoggedIn = true;
+  state.isLoginPending = false;
   state.username = username;
   state.error = "";
 }
 function logout() {
   state.isLoggedIn = false;
+  state.isLoginPending = false;
   state.username = "";
   state.error = "";
 }
+function waitOnChat() {
+  state.users = {};
+  state.messages = [];
+  state.isChatPending = true;
+  state.error = '';
+}
 function setLoginUsers(data) {
+  state.isChatPending = false;
   state.users = data;
   state.error = "";
 }
 function setMessages(data) {
+  state.isChatPending = false;
   state.messages = data;
   state.error = "";
 }
@@ -421,8 +454,78 @@ function setError(error) {
     return;
   }
   state.error = _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGES[error] || _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGES["default"];
+  state.isLoginPending = false;
+  state.isChatPending = false;
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (state);
+
+/***/ }),
+
+/***/ "../samples/services-todo/src/render.js":
+/*!**********************************************!*\
+  !*** ../samples/services-todo/src/render.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// Here we rebuild ALL the HTML whenever the state changes
+// That is not the most efficient way to do it
+// We COULD make these functions smarter about noticing what state changed
+// and what HTML is dependent on that state
+// and only replace the HTML that needs to be replaced
+// but we'll be moving to React soon where someone has already written that
+// The key part here is to see how the HTML is based on state
+// - at this stage, the "action" is not visible, only the state
+// - so our render is decoupled from the actions and events
+
+function render(_ref) {
+  var state = _ref.state,
+    appEl = _ref.appEl;
+  var html = "\n   <main class=\"\">\n     ".concat(generateStatusHtml(state), "\n     ").concat(generateLoginHtml(state), "\n     ").concat(generateContentHtml(state), "\n   </main>\n  ");
+  appEl.innerHTML = html;
+}
+function generateStatusHtml(state) {
+  return "\n      <div class=\"status\">".concat(state.error, "</div>\n  ");
+}
+function generateLoginHtml(state) {
+  if (state.isLoginPending) {
+    return "\n      <div class=\"login__waiting\">Loading user...</div>\n    ";
+  }
+  if (state.isLoggedIn) {
+    return "";
+  }
+
+  // The #/login below isn't "real" - the form should never navigate
+  // I included it merely as a hint to what the form does
+  return "\n      <div class=\"login\">\n        <form class=\"login__form\" action=\"#/login\">\n          <label>\n            <span>Username:</span>\n            <input class=\"login__username\" value=\"\">\n          </label>\n          <button class=\"login__button\" type=\"submit\">Login</button>\n        </form>\n      </div>\n  ";
+}
+function generateContentHtml(state) {
+  if (!state.isLoggedIn) {
+    return "";
+  }
+  if (state.isTodoPending) {
+    return "\n      <div class=\"content\">\n        ".concat(generateControlsHtml(state), "\n        <div class=\"todos__waiting\">Loading Todos...</div>\n      </div>\n    ");
+  }
+  return "\n      <div class=\"content\">\n        ".concat(generateControlsHtml(state), "\n        <ul class=\"todos\">").concat(generateTodosHtml(state), "</ul>\n        ").concat(generateAddTodoHtml(state), "\n      </div>\n  ");
+}
+function generateControlsHtml(state) {
+  return "\n        <div class=\"controls\">\n          <button class=\"controls__refresh\">Refresh</button>\n          <button class=\"controls__logout\">Logout</button>\n        </div>\n  ";
+}
+function generateTodosHtml(state) {
+  var todosHtml = Object.values(state.todos).map(function (todo) {
+    var isDoneClass = todo.done ? "todo__text--complete" : "";
+    var isAddedClass = state.lastAddedTodoId === todo.id ? "todo__text--added" : "";
+    return "\n      <li class=\"todo\">\n        <label\n        >\n          <input\n            class=\"todo__toggle\"\n            data-id=\"".concat(todo.id, "\"\n            type=\"checkbox\"\n            ").concat(todo.done ? "checked" : "", "\n          >\n          <span\n            data-id=\"").concat(todo.id, "\"\n            class=\"todo__toggle todo__text ").concat(isDoneClass, " ").concat(isAddedClass, " \"\n          >\n            ").concat(todo.task, "\n          </span>\n        </label>\n        <button\n          data-id=\"").concat(todo.id, "\"\n          class=\"todo__delete\"\n        >\n          &#10060;\n        </button>\n      </li>\n      ");
+  }).join('') || "<p>No Todo Items yet, add one!</p>";
+  return todosHtml;
+}
+function generateAddTodoHtml(state) {
+  return "\n        <form class=\"add__form\" action=\"#/add\">\n          <input class=\"add__task\">\n          <button type=\"submit\" class=\"add__button\">Add</button>\n        </form>\n  ";
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (render);
 
 /***/ })
 
@@ -494,6 +597,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _listeners__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./listeners */ "./src/listeners.js");
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
 /* harmony import */ var _services__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./services */ "./src/services.js");
+/* harmony import */ var _samples_services_todo_src_render__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../samples/services-todo/src/render */ "../samples/services-todo/src/render.js");
+
 
 
 
@@ -544,16 +649,7 @@ function refreshData() {
     });
     return (0,_services__WEBPACK_IMPORTED_MODULE_4__.fetchMessages)();
   })["catch"](function (err) {
-    if ((err === null || err === void 0 ? void 0 : err.error) === _constants__WEBPACK_IMPORTED_MODULE_3__.SERVER.AUTH_MISSING) {
-      return Promise.reject({
-        error: _constants__WEBPACK_IMPORTED_MODULE_3__.CLIENT.NO_SESSION
-      });
-    }
-    (0,_state__WEBPACK_IMPORTED_MODULE_1__.setError)((err === null || err === void 0 ? void 0 : err.error) || "ERROR");
-    (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
-      state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
-      appEl: appEl
-    });
+    return Promise.reject(err);
   }).then(function (messages) {
     (0,_state__WEBPACK_IMPORTED_MODULE_1__.setMessages)(messages);
     (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderChat)({
@@ -569,6 +665,11 @@ function refreshData() {
   });
 }
 function checkForSession() {
+  (0,_state__WEBPACK_IMPORTED_MODULE_1__.waitOnLogin)();
+  (0,_render__WEBPACK_IMPORTED_MODULE_0__.renderApp)({
+    state: _state__WEBPACK_IMPORTED_MODULE_1__["default"],
+    appEl: appEl
+  });
   // Fetch current user
   (0,_services__WEBPACK_IMPORTED_MODULE_4__.fetchSession)().then(function (session) {
     (0,_state__WEBPACK_IMPORTED_MODULE_1__.login)(session.username);

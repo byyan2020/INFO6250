@@ -1,8 +1,9 @@
 import { renderChat, renderApp } from "./render";
-import state, { login, logout, setLoginUsers, setMessages, setError } from "./state";
+import state, { login, logout, setLoginUsers, setMessages, setError, waitOnLogin } from "./state";
 import { addLoginListener, addLogoutListener, addPostMessageListener } from "./listeners";
 import { SERVER, CLIENT } from "./constants";
 import { fetchSession, fetchLoginUsers, fetchMessages } from "./services";
+import render from "../../samples/services-todo/src/render";
 
 const appEl = document.querySelector("#app");
 const chatEl = document.querySelector("#chat")
@@ -30,13 +31,7 @@ function refreshData() {
 			renderChat({ state, chatEl });
 			return fetchMessages();
 		})
-    .catch((err) => {
-      if( err?.error === SERVER.AUTH_MISSING ) {
-        return Promise.reject({ error: CLIENT.NO_SESSION })
-      }
-			setError(err?.error || "ERROR");
-			renderApp({ state, appEl });
-		})
+    .catch((err) =>  Promise.reject(err))
 		.then((messages) => {
 			setMessages(messages);
 			renderChat({ state, chatEl });
@@ -48,6 +43,8 @@ function refreshData() {
 }
 
 function checkForSession() {
+  waitOnLogin()
+  renderApp({ state, appEl })
 	// Fetch current user
 	fetchSession()
 		.then((session) => {

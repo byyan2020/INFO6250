@@ -6,7 +6,7 @@ import {
 	fetchPostMessage,
 } from "./services";
 import { renderApp, renderChat } from "./render";
-import { login, logout, setError, setLoginUsers, setMessages } from "./state";
+import { login, logout, setError, setLoginUsers, setMessages, waitOnChat } from "./state";
 
 export function addLoginListener({ state, appEl, chatEl }) {
 	appEl.addEventListener("submit", (e) => {
@@ -16,6 +16,8 @@ export function addLoginListener({ state, appEl, chatEl }) {
 		}
 
 		const username = appEl.querySelector(".login-username").value;
+    waitOnChat();
+    renderApp({ state, appEl })
 		// Service call to login
 		fetchLogin(username)
 			.then((users) => {
@@ -34,6 +36,7 @@ export function addLoginListener({ state, appEl, chatEl }) {
 				renderChat({ state, chatEl });
 			})
 			.catch((err) => {
+        logout();
 				setError(err?.error || "ERROR");
 				renderApp({ state, appEl });
 			});

@@ -13,7 +13,6 @@ function getLoginUsers() {
 
 function deleteLoginUsers(username) {
 	delete loginUsers[username];
-  console.log({loginUsers})
 }
 
 module.exports = {
