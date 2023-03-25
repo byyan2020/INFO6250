@@ -1,0 +1,117 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+
+	font-family: sans-serif;
+}
+
+h1 {
+	font-size: 1rem;
+}
+
+li,
+ul {
+	padding: 0;
+	margin: 0;
+}
+
+#chat-app {
+	display: grid;
+	grid-template-areas:
+		"users messages"
+		"outgoing outgoing";
+	grid-template-columns: auto 1fr;
+	grid-template-rows: 1fr auto;
+
+	height: 100%;
+}
+
+.login {
+	padding: 3rem;
+
+	display: flex;
+	flex-direction: column;
+	gap: 3rem;
+}
+
+.error {
+	background-color: orangered;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	padding: 1rem;
+}
+
+.login-info {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 1rem 2rem;
+	background-color: #948a9a;
+	color: white;
+	font-weight: bold;
+}
+
+.users {
+	grid-area: users;
+
+	background-color: #fffbf5;
+
+	padding: 1rem;
+	margin: 0;
+
+	overflow-y: auto;
+
+	list-style-type: none;
+}
+
+.messages {
+	grid-area: messages;
+
+	background-color: #fef5ff;
+
+	padding: 1rem;
+	margin: 0;
+
+	overflow-y: auto;
+
+	list-style-type: none;
+}
+
+.avatar {
+	height: 2rem;
+}
+
+.username {
+	margin: auto 1rem;
+}
+
+.message {
+	display: flex;
+	margin-bottom: 1rem;
+}
+
+.sender-info {
+	display: flex;
+	width: 15rem;
+}
+
+.message-text {
+	width: 100%;
+	margin: 0;
+	margin-top: auto;
+}
+
+.outgoing {
+	grid-area: outgoing;
+
+	background-color: #f7efe5;
+	padding: 2rem;
+}
