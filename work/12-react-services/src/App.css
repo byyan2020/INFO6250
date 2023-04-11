@@ -1,0 +1,99 @@
+/* General Settings */
+:root {
+	--color-primary: #7fb77e;
+	--color-extra: #507153;
+	--color-light: #f7f6dc;
+	--color-contrast: #f4693b;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	min-height: 100%;
+	font-family: "Open Sans", sans-serif;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+header {
+  background-color: var(--color-primary);
+  padding: 1rem;
+  color: white;
+}
+
+main {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+}
+
+footer {
+  background-color: var(--color-primary);
+  padding: 1rem;
+  color: white;
+  text-align: center;
+}
+
+.login {
+  padding: 1rem;
+}
+
+h2 {
+  padding-bottom: 1rem;
+}
+
+.word {
+  background-color: var(--color-light);
+  padding: 1rem;
+}
+
+.word-form {
+  padding: 1rem 0;
+}
+
+.alert {
+  color: var(--color-contrast);
+  padding: 1rem;
+  font-weight: bold;
+}
+
+.loading {
+  padding: 1rem;
+  font-weight: bold;
+}
+
+input {
+  margin: 0 0.5rem;
+  padding: 0.3rem;
+}
+
+button {
+	background-color: var(--color-extra);
+	color: white;
+
+	padding: 0.3rem;
+  border-radius: 0.2rem;
+	border: var(--color-extra);
+
+	font-weight: bold;
+}
+
+.form-btn:hover {
+	background-color: var(--color-primary);
+}
+
+.logout {
+  display: flex;
+  justify-content: space-between;
+}
+
