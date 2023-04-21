@@ -1,54 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { fetchLogin, fetchLogout, fetchSession } from "./services";
-import { SERVER } from "./constants";
+import { CLIENT, ACTIONS } from "./constants";
+import AppContext from "./AppContext";
 
-function Login({ isLoggedIn, setIsLoggedIn, setError}) {
-	const [username, setUsername] = useState("");
-  const [loading, setLoading] = useState(false)
+function Login() {
+  const {state, dispatch} = useContext(AppContext)
 
-	const loginHandler = (e) => {
-		e.preventDefault();
-		setLoading(true);
-		fetchLogin(username)
-			.then(() => {
-				setIsLoggedIn(true);
-				setError("");
-				setLoading(false);
+  const [tempUsername, setTempUsername] = useState('')
+
+  function handleLogin(e) {
+    e.preventDefault();
+		fetchLogin(tempUsername)
+			.then(({ username }) => {
+				dispatch({ type: ACTIONS.LOG_IN, username });
 			})
 			.catch((err) => {
-				setError(err?.error || "ERROR");
-				setLoading(false);
+				dispatch({ type: ACTIONS.REPORT_ERROR, error: err?.error });
 			});
-	};
+	}
 
-	const logoutHandler = () => {
-		setIsLoggedIn(false);
-		setUsername("");
-		setError("");
-		setLoading(false);
-		fetchLogout().catch((err) => {
-			setError(err?.error || "ERROR");
-			setLoading(false);
-		});
-	};
+	function handleLogout() {
+		dispatch({ type: ACTIONS.LOG_OUT });
+		fetchLogout() 
+			.catch((err) => {
+				dispatch({ type: ACTIONS.REPORT_ERROR, error: err?.error });
+			});
+	}
 
-	const checkForSession = () => {
-		setLoading(true);
+	function checkForSession() {
 		fetchSession()
 			.then(({ username }) => {
-				setUsername(username);
-				setIsLoggedIn(true);
-				setLoading(false);
-				setError("");
+				dispatch({ type: ACTIONS.LOG_IN, username: username });
+				console.log(username);
+				return username;
 			})
 			.catch((err) => {
-				setLoading(false);
-				if (err?.error === SERVER.AUTH_MISSING) {
+				if (err?.error === CLIENT.NO_SESSION) {
+					dispatch({ type: ACTIONS.LOG_OUT });
 					return;
 				}
-				setError(err?.error || "ERROR");
+				dispatch({ type: ACTIONS.REPORT_ERROR, error: err?.error });
 			});
-	};
+	}
 
 	useEffect(() => {
 		checkForSession();
@@ -57,21 +50,21 @@ function Login({ isLoggedIn, setIsLoggedIn, setError}) {
 	return (
 		<div className="login">
 			<h2>User</h2>
-			{isLoggedIn ? (
+			{state.isLoggedIn ? (
 				<div className="logout">
-					Hello {username}
-					<button onClick={logoutHandler} className="logout-btn">
+					Hello {state.username}
+					<button onClick={handleLogout} className="logout-btn">
 						Logout
 					</button>
 				</div>
 			) : (
-				<form className="login-form" onSubmit={loginHandler}>
+				<form className="login-form" onSubmit={handleLogin}>
 					<label className="form-label">
 						<span>Username:</span>
 						<input
 							className="login-username"
-							value={username}
-							onInput={(e) => setUsername(e.target.value)}
+							value={tempUsername}
+							onInput={(e) => setTempUsername(e.target.value)}
 						/>
 					</label>
 					<button type="submit" className="form-btn">

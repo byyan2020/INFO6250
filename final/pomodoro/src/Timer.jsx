@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { TIMER_TIME } from "./constants";
+import { ACTIONS, TIMER_TIME } from "./constants";
 import { fetchPutTimer, fetchTimer } from "./services";
+import { useContext } from "react";
+import AppContext from "./AppContext";
 
-function Timer({ time, setTime, isRunning, setIsRunning, count, setCount }) {
-	const [workFinished, setWorkFinished] = useState(false);
-	const [isTempPaused, setIsTempPaused] = useState(false);
+function Timer() {
+	const { state, dispatch } = useContext(AppContext);
 
-  /* 
+	/* Timer status
   1. not running
   2. running & in work session
   3. runing & in work session & paused
@@ -15,70 +16,72 @@ function Timer({ time, setTime, isRunning, setIsRunning, count, setCount }) {
   */
 
 	const handleWork = () => {
-		setTime(TIMER_TIME.WORK);
-		setIsRunning(true);
-		setWorkFinished(false);
+		dispatch({ type: ACTIONS.TIMER_WORK_SESSION });
 	};
 
 	const handleRest = () => {
-		setTime(TIMER_TIME.REST);
-		setIsRunning(true);
-		setWorkFinished(true);
+		dispatch({ type: ACTIONS.TIMER_REST_SESSION });
 	};
 
 	const handlePause = () => {
-		setIsTempPaused(!isTempPaused);
+		if (state.timerStatus.isTimerPaused) {
+			dispatch({ type: ACTIONS.TIMER_CONTINUE });
+		} else {
+			dispatch({ type: ACTIONS.TIMER_PAUSE });
+		}
 	};
 
 	const handleCancleTimer = () => {
-		setIsRunning(false);
-		setIsTempPaused(false);
-		setTime(TIMER_TIME.WORK);
+		dispatch({ type: ACTIONS.TIMER_NOT_START });
+		const initialTimerState = {
+			seconds: TIMER_TIME.WORK,
+			isTimerStart: false,
+			isTimerPaused: false,
+			isOnWorkSession: true,
+		};
+		fetchPutTimer(initialTimerState).catch((err) => {
+			console.log(err);
+		});
 	};
 
-  // Change timer every second
+	// Change timer every second
 	useEffect(() => {
-		if (isRunning && !isTempPaused) {
+		if (state.timerStatus.isTimerStart && !state.timerStatus.isTimerPaused) {
 			const timer = setInterval(() => {
-				setTime((prevTime) => prevTime - 1);
+				dispatch({ type: ACTIONS.TIMER_DECREMENT });
 			}, 1000);
-			if (time === 0 && !workFinished) {
-				setTime(TIMER_TIME.REST);
-				setWorkFinished(true);
-			} else if (time === 0 && workFinished) {
-				setTime(TIMER_TIME.WORK);
-				setWorkFinished(false);
-				setCount((prevCount) => prevCount + 1);
+			if (state.timerStatus.seconds === 0 && state.timerStatus.isOnWorkSession) {
+				dispatch({ type: ACTIONS.TIMER_REST_SESSION });
+			} else if (state.timerStatus.seconds === 0 && !state.timerStatus.isOnWorkSession) {
+				dispatch({ type: ACTIONS.TIMER_WORK_SESSION });
+				dispatch({ type: ACTIONS.RECORD_INCREMENT });
 			}
 			return () => clearInterval(timer);
 		}
-	}, [isRunning, isTempPaused, time]);
+	}, [state.timerStatus.isTimerStart, state.timerStatus.isTimerPaused, state.timerStatus.seconds]);
 
-  // Fetch timer from backend when page reload
+	// Fetch timer from backend when page reload
 	useEffect(() => {
 		fetchTimer()
-			.then(({ timer, isTimerRunning, isTimerPaused, isWorkFinished }) => {
-        console.log(timer, isTimerRunning, isTimerPaused, isWorkFinished)
-				setTime(timer);
-				setIsRunning(isTimerRunning);
-				setIsTempPaused(isTimerPaused);
-        setWorkFinished(isWorkFinished)
+			.then(({ timerStatus }) => {
+				dispatch({ type: ACTIONS.TIMER_SET, timerStatus });
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	}, []);
 
-  // Update backend timer when frontend timer change
+	// Update backend timer when frontend timer change
 	useEffect(() => {
-    if (isRunning) {
-      fetchPutTimer(time, isRunning, isTempPaused, workFinished).catch((err) => {
-        console.log(err);
-		})};
-	}, [time, isRunning, isTempPaused, workFinished]);
+		if (state.timerStatus.isTimerStart) {
+			fetchPutTimer(state.timerStatus).catch((err) => {
+				console.log(err);
+			});
+		}
+	}, [state.timerStatus]);
 
-	const minutes = Math.floor(time / 60);
-	const seconds = time % 60;
+	const minutes = Math.floor(state.timerStatus.seconds / 60);
+	const seconds = state.timerStatus.seconds % 60;
 	const formattedTime = `${minutes.toString().padStart(2, "0")}:${seconds
 		.toString()
 		.padStart(2, "0")}`;
@@ -87,16 +90,28 @@ function Timer({ time, setTime, isRunning, setIsRunning, count, setCount }) {
 		<>
 			<h2>Timer</h2>
 			<div>Timer: {formattedTime}</div>
-			{isRunning && (
+			{state.timerStatus.isTimerStart && (
 				<p>
-					{workFinished ? "You are currently on a rest cycle" : "You are currently on a work cycle"}
+					{!state.timerStatus.isOnWorkSession
+						? "You are currently on a rest cycle"
+						: "You are currently on a work cycle"}
 				</p>
 			)}
-			{isRunning && <button onClick={handlePause}>{isTempPaused ? "Continue" : "Pause"}</button>}
-			{!isRunning && <button onClick={handleWork}>Start a new work cycle</button>}
-			{isRunning && workFinished && <button onClick={handleWork}>Start a new work cycle</button>}
-			{isRunning && !workFinished && <button onClick={handleRest}>Skip to rest</button>}
-			{isRunning && <button onClick={handleCancleTimer}>Cancle Timer</button>}
+			{state.timerStatus.isTimerStart && (
+				<button onClick={handlePause}>
+					{state.timerStatus.isTimerPaused ? "Continue" : "Pause"}
+				</button>
+			)}
+			{!state.timerStatus.isTimerStart && (
+				<button onClick={handleWork}>Start a new work cycle</button>
+			)}
+			{state.timerStatus.isTimerStart && !state.timerStatus.isOnWorkSession && (
+				<button onClick={handleWork}>Start a new work cycle</button>
+			)}
+			{state.timerStatus.isTimerStart && state.timerStatus.isOnWorkSession && (
+				<button onClick={handleRest}>Skip to rest</button>
+			)}
+			{state.timerStatus.isTimerStart && <button onClick={handleCancleTimer}>Cancle Timer</button>}
 		</>
 	);
 }

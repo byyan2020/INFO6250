@@ -66,17 +66,14 @@ export function fetchTimer() {
 		});
 }
 
-export function fetchPutTimer(timer, isTimerRunning, isTimerPaused, isWorkFinished) {
+export function fetchPutTimer(timerStatus) {
 	return fetch("/api/timer", {
 		method: "PUT",
 		headers: new Headers({
 			"content-type": "application/json",
 		}),
 		body: JSON.stringify({
-			timer: timer,
-			isTimerRunning: isTimerRunning,
-			isTimerPaused: isTimerPaused,
-      isWorkFinished: isWorkFinished
+			timerStatus,
 		}),
 	})
 		.catch(() => Promise.reject({ error: "networkError" }))
@@ -107,15 +104,14 @@ export function fetchAlarm() {
 		});
 }
 
-export function fetchPutAlarm(alarm, isAlarmOn) {
+export function fetchPutAlarm(alarmTime, isAlarmOn) {
 	return fetch("/api/alarm", {
 		method: "PUT",
 		headers: new Headers({
 			"content-type": "application/json",
 		}),
 		body: JSON.stringify({
-			alarm: alarm,
-			isAlarmOn: isAlarmOn,
+			alarmStatus: { alarmTime: alarmTime, isAlarmOn: isAlarmOn },
 		}),
 	})
 		.catch(() => Promise.reject({ error: "networkError" }))

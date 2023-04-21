@@ -4,9 +4,10 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const sessions = require("./sessions");
-const users = require("./users");
-const data = require("./data")
+const sessions = require("./database/sessions");
+const users = require("./database/users");
+const timerData = require("./database/timerData")
+const alarmData = require("./database/alarmData")
 
 app.use(cookieParser());
 app.use(express.static("./build"));
@@ -37,12 +38,11 @@ app.post("/api/session", (req, res) => {
 	}
 
 	const sid = sessions.addSession(username);
+  const userId = users.createUser(username)
 
-  const existingUserData = users.getUserData(username);
-
-  if(!existingUserData) {
-    users.addUserData(username, data.makeData());
-  }
+  // Create default timer, alarm, record state
+  timerData.createTimer(userId)
+  alarmData.createAlarm(userId)
 
 	res.cookie("sid", sid);
 	res.json({ username });
@@ -72,7 +72,10 @@ app.get('/api/timer', (req, res) => {
 		return;
 	}
 
-  res.json(users.getUserData(username).getTimer());
+  const userId = users.getUserId(username)
+  // TODO what if the timer status do not exsit
+  const timerStatus = timerData.getTimer(userId)
+  res.json({timerStatus});
 });
 
 app.put('/api/timer', (req, res) => {
@@ -82,10 +85,11 @@ app.put('/api/timer', (req, res) => {
 		res.status(401).json({ error: "auth-missing" });
 		return;
 	}
-
-  users.getUserData(username).setTimer(req.body.timer, req.body.isTimerRunning, req.body.isTimerPaused, req.body.isWorkFinished)
-  console.log(users.getUserData(username).getTimer())
-  res.json(users.getUserData(username).getTimer())
+  const userId = users.getUserId(username)
+  const reqTimerStatus = req.body.timerStatus
+  const timerStatus = timerData.setTimer(userId, reqTimerStatus)
+  
+  res.json({timerStatus})
 })
 
 // Alarm
@@ -97,7 +101,11 @@ app.get('/api/alarm', (req, res) => {
 		return;
 	}
 
-  res.json(users.getUserData(username).getAlarm());
+  const userId = users.getUserId(username)
+  // TODO what if the alarm status do not exsit
+  const alarmStatus = alarmData.getAlarm(userId)
+
+  res.json({alarmStatus});
 })
 
 app.put('/api/alarm', (req, res) => {
@@ -107,9 +115,13 @@ app.put('/api/alarm', (req, res) => {
 		res.status(401).json({ error: "auth-missing" });
 		return;
 	}
-  users.getUserData(username).setAlarm(req.body.alarm, req.body.isAlarmOn)
-  console.log(users.getUserData(username).getAlarm())
-  res.json(users.getUserData(username).getAlarm())
+
+  const userId = users.getUserId(username)
+  const reqAlarmStatus = req.body.alarm
+  const alarmStatus = alarmData.setAlarm(userId, reqAlarmStatus)
+  
+  res.json({alarmStatus})
+  
 })
 
 app.listen(PORT, () => console.log(`http://localhost:${PORT}`));

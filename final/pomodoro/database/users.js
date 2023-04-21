@@ -1,4 +1,5 @@
 const users = {};
+const uuid = require('uuid').v4;
 
 function isValid(username) {
 	let isValid = true;
@@ -7,16 +8,17 @@ function isValid(username) {
 	return isValid;
 }
 
-function getUserData(username) {
+function getUserId(username) {
 	return users[username];
 }
 
-function addUserData(username, userData) {
-	users[username] = userData;
+function createUser(username) {
+	users[username] = uuid();
+  return users[username]
 }
 
 module.exports = {
 	isValid,
-	getUserData,
-	addUserData,
+	getUserId,
+	createUser,
 };

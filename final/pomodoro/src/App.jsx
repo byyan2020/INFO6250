@@ -1,19 +1,22 @@
-import { useState } from "react";
+import React, { useReducer, useState } from "react";
 import "./App.css";
 import Timer from "./Timer";
 import Alarm from "./Alarm";
-import Record from './Record';
-import Error from './Error'
+import Record from "./Record";
+import Error from "./Error";
 import Login from "./Login";
-import { TIMER_TIME } from "./constants";
+import { ACTIONS, TIMER_TIME, CLIENT } from "./constants";
+import reducer, { initialState } from "./reducer";
+import { fetchSession, fetchLogin, fetchLogout } from "./services";
+import AppContext from "./AppContext";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [error, setError] = useState('')
+	const [state, dispatch] = useReducer(reducer, initialState);
 
-  const [time, setTime] = useState(TIMER_TIME.WORK)
-  const [isRunning, setIsRunning] = useState(false)
-  const [count, setCount] = useState(0)
+	const [error, setError] = useState("");
+	const [time, setTime] = useState(TIMER_TIME.WORK);
+	const [isRunning, setIsRunning] = useState(false);
+	const [count, setCount] = useState(0);
 
 	return (
 		<div className="App">
@@ -21,11 +24,13 @@ function App() {
 				<h1>Pomodoro timer</h1>
 			</header>
 			<main>
-        <Error error={error}/>
-        <Login isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setError={setError} />
-        <Record count={count}/>
-				<Timer time={time} setTime={setTime} isRunning={isRunning} setIsRunning={setIsRunning} count={count} setCount={setCount}/>
-        <Alarm setTime={setTime} setIsRunning={setIsRunning}/>
+				<AppContext.Provider value={{ state, dispatch }}>
+					<Error />
+					<Login/>
+					<Record/>
+					<Timer/>
+					<Alarm setTime={setTime} setIsRunning={setIsRunning} />
+				</AppContext.Provider>
 			</main>
 		</div>
 	);

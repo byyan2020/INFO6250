@@ -28,3 +28,22 @@ export const MESSAGES = {
   [SERVER.REQUIRED_WORD]: 'Please enter a valid word consisting of letters and/or numbers',
   default: 'Something went wrong.  Please try again',
 };
+
+export const ACTIONS = {
+  LOG_IN: 'logIn',
+  LOG_OUT: 'logOut',
+
+  TIMER_SET: 'timerSet',
+  TIMER_DECREMENT: 'timerDecrement',
+  TIMER_WORK_SESSION: 'timerWorkSession',
+  TIMER_REST_SESSION: 'timerRestSession',
+  TIMER_PAUSE: 'timerPause',
+  TIMER_CONTINUE: 'timerContinue',
+  TIMER_NOT_START: 'timerNotStart',
+
+  SET_ALARM: 'setAlarm',
+
+  RECORD_INCREMENT: 'recordIncrement',
+  
+  REPORT_ERROR: 'reportError'
+};
