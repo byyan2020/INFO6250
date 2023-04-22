@@ -4,7 +4,7 @@ export const initialState = {
 	error: "",
 	username: "",
 	isLoggedIn: false,
-	timerStatus: {},
+	timerState: {},
 	alarmStatus: {},
 	count: 0,
 };
@@ -32,15 +32,15 @@ function reducer(state, action) {
 		case ACTIONS.TIMER_SET:
 			return {
 				...state,
-				timerStatus: action.timerStatus,
+				timerState: action.timerState,
 			};
 
 		case ACTIONS.TIMER_DECREMENT:
 			return {
 				...state,
-				timerStatus: {
-					...state.timerStatus,
-					secondsLeft: state.timerStatus.secondsLeft - 1,
+				timerState: {
+					...state.timerState,
+					secondsLeft: state.timerState.secondsLeft - 1,
 				},
 			};
 
@@ -48,8 +48,8 @@ function reducer(state, action) {
 			return {
 				...state,
 				error: "",
-				timerStatus: {
-					...state.timerStatus,
+				timerState: {
+					...state.timerState,
 					secondsLeft: TIMER_TIME.WORK,
 					isTimerStart: true,
 					isTimerPaused: false,
@@ -61,8 +61,8 @@ function reducer(state, action) {
 			return {
 				...state,
 				error: "",
-				timerStatus: {
-					...state.timerStatus,
+				timerState: {
+					...state.timerState,
 					secondsLeft: TIMER_TIME.REST,
 					isTimerStart: true,
 					isTimerPaused: false,
@@ -74,8 +74,8 @@ function reducer(state, action) {
 			return {
 				...state,
 				error: "",
-				timerStatus: {
-					...state.timerStatus,
+				timerState: {
+					...state.timerState,
 					isTimerPaused: true,
 				},
 			};
@@ -84,8 +84,8 @@ function reducer(state, action) {
 			return {
 				...state,
 				error: "",
-				timerStatus: {
-					...state.timerStatus,
+				timerState: {
+					...state.timerState,
 					isTimerPaused: false,
 				},
 			};
@@ -94,8 +94,8 @@ function reducer(state, action) {
 			return {
 				...state,
 				error: "",
-				timerStatus: {
-					...state.timerStatus,
+				timerState: {
+					...state.timerState,
 					secondsLeft: TIMER_TIME.WORK,
 					isTimerStart: false,
 					isTimerPaused: false,

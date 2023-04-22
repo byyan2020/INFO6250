@@ -7,11 +7,19 @@ const PORT = process.env.PORT || 3000;
 const sessions = require("./database/sessions");
 const users = require("./database/users");
 const timerData = require("./database/timerData")
-const alarmData = require("./database/alarmData")
+const alarmData = require("./database/alarmData");
 
 app.use(cookieParser());
 app.use(express.static("./build"));
 app.use(express.json());
+
+const TIMER_STATUS = {
+  PAUSE: 'pause',
+  CONTINUE: 'continue',
+  WORK: 'work',
+  REST: 'rest',
+  RESET: 'reset',  
+}
 
 // Sessions
 app.get("/api/session", (req, res) => {
@@ -73,8 +81,8 @@ app.get('/api/timer', (req, res) => {
 	}
 
   const userId = users.getUserId(username)
-  const timerStatus = timerData.getTimer(userId)
-  res.json({timerStatus});
+  const timerState = timerData.getTimer(userId)
+  res.json({timerState});
 });
 
 app.put('/api/timer', (req, res) => {
@@ -85,70 +93,24 @@ app.put('/api/timer', (req, res) => {
 		return;
 	}
   const userId = users.getUserId(username)
-  const reqTimerStatus = req.body.timerStatus
-  const timerStatus = timerData.setTimer(userId, reqTimerStatus)
+  const reqtimerStatus = req.body.timerStatus
   
-  res.json({timerStatus})
-})
-
-app.get('/api/timer/work', (req, res) => {
-  const sid = req.cookies.sid;
-	const username = sid ? sessions.getSessionUser(sid) : "";
-	if (!sid || !users.isValid(username)) {
-		res.status(401).json({ error: "auth-missing" });
-		return;
-	}
-  const userId = users.getUserId(username)
-  const timerStatus = timerData.startWork(userId)
-  res.json({timerStatus})
-})
-
-app.get('/api/timer/rest', (req, res) => {
-  const sid = req.cookies.sid;
-	const username = sid ? sessions.getSessionUser(sid) : "";
-	if (!sid || !users.isValid(username)) {
-		res.status(401).json({ error: "auth-missing" });
-		return;
-	}
-  const userId = users.getUserId(username)
-  const timerStatus = timerData.startRest(userId)
-  res.json({timerStatus})
-})
-
-app.get('/api/timer/pause', (req, res) => {
-  const sid = req.cookies.sid;
-	const username = sid ? sessions.getSessionUser(sid) : "";
-	if (!sid || !users.isValid(username)) {
-		res.status(401).json({ error: "auth-missing" });
-		return;
-	}
-  const userId = users.getUserId(username)
-  const timerStatus = timerData.pauseTimer(userId)
-  res.json({timerStatus})
-})
-
-app.get('/api/timer/continue', (req, res) => {
-  const sid = req.cookies.sid;
-	const username = sid ? sessions.getSessionUser(sid) : "";
-	if (!sid || !users.isValid(username)) {
-		res.status(401).json({ error: "auth-missing" });
-		return;
-	}
-  const userId = users.getUserId(username)
-  const timerStatus = timerData.continueTimer(userId)
-  res.json({timerStatus})
-})
-
-app.get('/api/timer/reset', (req, res) => {
-  const sid = req.cookies.sid;
-	const username = sid ? sessions.getSessionUser(sid) : "";
-	if (!sid || !users.isValid(username)) {
-		res.status(401).json({ error: "auth-missing" });
-		return;
-	}
-  const userId = users.getUserId(username)
-  const timerStatus = timerData.resetTimer(userId)
-  res.json({timerStatus})
+  let timerState;
+  if (reqtimerStatus === TIMER_STATUS.RESET) {
+    timerState = timerData.resetTimer(userId)
+  } else if (reqtimerStatus === TIMER_STATUS.WORK) {
+    timerState = timerData.startWork(userId)
+  } else if (reqtimerStatus === TIMER_STATUS.REST) {
+    timerState = timerData.startRest(userId)
+  } else if (reqtimerStatus === TIMER_STATUS.PAUSE) {
+    timerState = timerData.pauseTimer(userId)
+  } else if (reqtimerStatus === TIMER_STATUS.CONTINUE) {
+    timerState = timerData.continueTimer(userId)
+  } else {
+    res.status(400).json({ error: "unknown-timer-status" });
+  }
+    
+  res.json({timerState})
 })
 
 // Alarm

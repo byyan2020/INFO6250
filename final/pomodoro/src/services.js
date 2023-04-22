@@ -1,3 +1,4 @@
+// Session
 export function fetchSession() {
 	return fetch("/api/session", {
 		method: "GET",
@@ -50,88 +51,9 @@ export function fetchLogin(username) {
 		});
 }
 
+// Timer
 export function fetchTimer() {
 	return fetch("/api/timer", {
-		method: "GET",
-	})
-		.catch(() => Promise.reject({ error: "networkError" }))
-		.then((response) => {
-			if (response.ok) {
-				return response.json();
-			}
-			return response
-				.json()
-				.catch((error) => Promise.reject({ error }))
-				.then((err) => Promise.reject(err));
-		});
-}
-
-export function fetchTimerWork() {
-	return fetch("/api/timer/work", {
-		method: "GET",
-	})
-		.catch(() => Promise.reject({ error: "networkError" }))
-		.then((response) => {
-			if (response.ok) {
-				return response.json();
-			}
-			return response
-				.json()
-				.catch((error) => Promise.reject({ error }))
-				.then((err) => Promise.reject(err));
-		});
-}
-
-export function fetchTimerRest() {
-	return fetch("/api/timer/rest", {
-		method: "GET",
-	})
-		.catch(() => Promise.reject({ error: "networkError" }))
-		.then((response) => {
-			if (response.ok) {
-				return response.json();
-			}
-			return response
-				.json()
-				.catch((error) => Promise.reject({ error }))
-				.then((err) => Promise.reject(err));
-		});
-}
-
-export function fetchTimerPause() {
-	return fetch("/api/timer/pause", {
-		method: "GET",
-	})
-		.catch(() => Promise.reject({ error: "networkError" }))
-		.then((response) => {
-			if (response.ok) {
-				return response.json();
-			}
-			return response
-				.json()
-				.catch((error) => Promise.reject({ error }))
-				.then((err) => Promise.reject(err));
-		});
-}
-
-export function fetchTimerContinue() {
-	return fetch("/api/timer/continue", {
-		method: "GET",
-	})
-		.catch(() => Promise.reject({ error: "networkError" }))
-		.then((response) => {
-			if (response.ok) {
-				return response.json();
-			}
-			return response
-				.json()
-				.catch((error) => Promise.reject({ error }))
-				.then((err) => Promise.reject(err));
-		});
-}
-
-export function fetchTimerReset() {
-	return fetch("/api/timer/reset", {
 		method: "GET",
 	})
 		.catch(() => Promise.reject({ error: "networkError" }))
@@ -168,8 +90,7 @@ export function fetchPutTimer(timerStatus) {
 		});
 }
 
-
-
+// Alarm
 export function fetchAlarm() {
 	return fetch("/api/alarm", {
 		method: "GET",

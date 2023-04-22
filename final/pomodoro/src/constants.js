@@ -5,8 +5,10 @@ export const TIMER_TIME = {
 
 export const TIMER_STATUS = {
   PAUSE: 'pause',
+  CONTINUE: 'continue',
   WORK: 'work',
-  REST: 'rest'
+  REST: 'rest',
+  RESET: 'reset',  
 }
 
 export const SERVER = {
