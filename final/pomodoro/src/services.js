@@ -66,6 +66,86 @@ export function fetchTimer() {
 		});
 }
 
+export function fetchTimerWork() {
+	return fetch("/api/timer/work", {
+		method: "GET",
+	})
+		.catch(() => Promise.reject({ error: "networkError" }))
+		.then((response) => {
+			if (response.ok) {
+				return response.json();
+			}
+			return response
+				.json()
+				.catch((error) => Promise.reject({ error }))
+				.then((err) => Promise.reject(err));
+		});
+}
+
+export function fetchTimerRest() {
+	return fetch("/api/timer/rest", {
+		method: "GET",
+	})
+		.catch(() => Promise.reject({ error: "networkError" }))
+		.then((response) => {
+			if (response.ok) {
+				return response.json();
+			}
+			return response
+				.json()
+				.catch((error) => Promise.reject({ error }))
+				.then((err) => Promise.reject(err));
+		});
+}
+
+export function fetchTimerPause() {
+	return fetch("/api/timer/pause", {
+		method: "GET",
+	})
+		.catch(() => Promise.reject({ error: "networkError" }))
+		.then((response) => {
+			if (response.ok) {
+				return response.json();
+			}
+			return response
+				.json()
+				.catch((error) => Promise.reject({ error }))
+				.then((err) => Promise.reject(err));
+		});
+}
+
+export function fetchTimerContinue() {
+	return fetch("/api/timer/continue", {
+		method: "GET",
+	})
+		.catch(() => Promise.reject({ error: "networkError" }))
+		.then((response) => {
+			if (response.ok) {
+				return response.json();
+			}
+			return response
+				.json()
+				.catch((error) => Promise.reject({ error }))
+				.then((err) => Promise.reject(err));
+		});
+}
+
+export function fetchTimerReset() {
+	return fetch("/api/timer/reset", {
+		method: "GET",
+	})
+		.catch(() => Promise.reject({ error: "networkError" }))
+		.then((response) => {
+			if (response.ok) {
+				return response.json();
+			}
+			return response
+				.json()
+				.catch((error) => Promise.reject({ error }))
+				.then((err) => Promise.reject(err));
+		});
+}
+
 export function fetchPutTimer(timerStatus) {
 	return fetch("/api/timer", {
 		method: "PUT",
@@ -87,6 +167,8 @@ export function fetchPutTimer(timerStatus) {
 				.then((err) => Promise.reject(err));
 		});
 }
+
+
 
 export function fetchAlarm() {
 	return fetch("/api/alarm", {

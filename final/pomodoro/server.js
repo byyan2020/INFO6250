@@ -41,7 +41,7 @@ app.post("/api/session", (req, res) => {
   const userId = users.createUser(username)
 
   // Create default timer, alarm, record state
-  timerData.createTimer(userId)
+  timerData.resetTimer(userId)
   alarmData.createAlarm(userId)
 
 	res.cookie("sid", sid);
@@ -73,7 +73,6 @@ app.get('/api/timer', (req, res) => {
 	}
 
   const userId = users.getUserId(username)
-  // TODO what if the timer status do not exsit
   const timerStatus = timerData.getTimer(userId)
   res.json({timerStatus});
 });
@@ -92,6 +91,66 @@ app.put('/api/timer', (req, res) => {
   res.json({timerStatus})
 })
 
+app.get('/api/timer/work', (req, res) => {
+  const sid = req.cookies.sid;
+	const username = sid ? sessions.getSessionUser(sid) : "";
+	if (!sid || !users.isValid(username)) {
+		res.status(401).json({ error: "auth-missing" });
+		return;
+	}
+  const userId = users.getUserId(username)
+  const timerStatus = timerData.startWork(userId)
+  res.json({timerStatus})
+})
+
+app.get('/api/timer/rest', (req, res) => {
+  const sid = req.cookies.sid;
+	const username = sid ? sessions.getSessionUser(sid) : "";
+	if (!sid || !users.isValid(username)) {
+		res.status(401).json({ error: "auth-missing" });
+		return;
+	}
+  const userId = users.getUserId(username)
+  const timerStatus = timerData.startRest(userId)
+  res.json({timerStatus})
+})
+
+app.get('/api/timer/pause', (req, res) => {
+  const sid = req.cookies.sid;
+	const username = sid ? sessions.getSessionUser(sid) : "";
+	if (!sid || !users.isValid(username)) {
+		res.status(401).json({ error: "auth-missing" });
+		return;
+	}
+  const userId = users.getUserId(username)
+  const timerStatus = timerData.pauseTimer(userId)
+  res.json({timerStatus})
+})
+
+app.get('/api/timer/continue', (req, res) => {
+  const sid = req.cookies.sid;
+	const username = sid ? sessions.getSessionUser(sid) : "";
+	if (!sid || !users.isValid(username)) {
+		res.status(401).json({ error: "auth-missing" });
+		return;
+	}
+  const userId = users.getUserId(username)
+  const timerStatus = timerData.continueTimer(userId)
+  res.json({timerStatus})
+})
+
+app.get('/api/timer/reset', (req, res) => {
+  const sid = req.cookies.sid;
+	const username = sid ? sessions.getSessionUser(sid) : "";
+	if (!sid || !users.isValid(username)) {
+		res.status(401).json({ error: "auth-missing" });
+		return;
+	}
+  const userId = users.getUserId(username)
+  const timerStatus = timerData.resetTimer(userId)
+  res.json({timerStatus})
+})
+
 // Alarm
 app.get('/api/alarm', (req, res) => {
   const sid = req.cookies.sid;
@@ -102,7 +161,6 @@ app.get('/api/alarm', (req, res) => {
 	}
 
   const userId = users.getUserId(username)
-  // TODO what if the alarm status do not exsit
   const alarmStatus = alarmData.getAlarm(userId)
 
   res.json({alarmStatus});

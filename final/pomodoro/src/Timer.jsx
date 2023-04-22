@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { ACTIONS, TIMER_TIME } from "./constants";
-import { fetchPutTimer, fetchTimer } from "./services";
+import {
+	fetchPutTimer,
+	fetchTimer,
+	fetchTimerContinue,
+	fetchTimerPause,
+	fetchTimerReset,
+  fetchTimerRest,
+	fetchTimerWork,
+} from "./services";
 import { useContext } from "react";
 import AppContext from "./AppContext";
 
@@ -16,31 +24,32 @@ function Timer() {
   */
 
 	const handleWork = () => {
-		dispatch({ type: ACTIONS.TIMER_WORK_SESSION });
+		fetchTimerWork().then(({ timerStatus }) => {
+			dispatch({ type: ACTIONS.TIMER_SET, timerStatus });
+		});
 	};
 
 	const handleRest = () => {
-		dispatch({ type: ACTIONS.TIMER_REST_SESSION });
+		fetchTimerRest().then(() => {
+			dispatch({ type: ACTIONS.TIMER_REST_SESSION });
+		});
 	};
 
 	const handlePause = () => {
 		if (state.timerStatus.isTimerPaused) {
-			dispatch({ type: ACTIONS.TIMER_CONTINUE });
+			fetchTimerContinue().then(() => {
+				dispatch({ type: ACTIONS.TIMER_CONTINUE });
+			});
 		} else {
-			dispatch({ type: ACTIONS.TIMER_PAUSE });
+			fetchTimerPause().then(() => {
+				dispatch({ type: ACTIONS.TIMER_PAUSE });
+			});
 		}
 	};
 
 	const handleCancleTimer = () => {
-		dispatch({ type: ACTIONS.TIMER_NOT_START });
-		const initialTimerState = {
-			seconds: TIMER_TIME.WORK,
-			isTimerStart: false,
-			isTimerPaused: false,
-			isOnWorkSession: true,
-		};
-		fetchPutTimer(initialTimerState).catch((err) => {
-			console.log(err);
+		fetchTimerReset().then(() => {
+			dispatch({ type: ACTIONS.TIMER_NOT_START });
 		});
 	};
 
@@ -50,20 +59,21 @@ function Timer() {
 			const timer = setInterval(() => {
 				dispatch({ type: ACTIONS.TIMER_DECREMENT });
 			}, 1000);
-			if (state.timerStatus.seconds === 0 && state.timerStatus.isOnWorkSession) {
-				dispatch({ type: ACTIONS.TIMER_REST_SESSION });
-			} else if (state.timerStatus.seconds === 0 && !state.timerStatus.isOnWorkSession) {
-				dispatch({ type: ACTIONS.TIMER_WORK_SESSION });
+			if (state.timerStatus.secondsLeft === 0 && state.timerStatus.isOnWorkSession) {
+				fetchTimerRest().then(() => dispatch({ type: ACTIONS.TIMER_REST_SESSION }));
+			} else if (state.timerStatus.secondsLeft === 0 && !state.timerStatus.isOnWorkSession) {
+        fetchTimerWork().then(() => dispatch({ type: ACTIONS.TIMER_WORK_SESSION }))
 				dispatch({ type: ACTIONS.RECORD_INCREMENT });
 			}
 			return () => clearInterval(timer);
 		}
-	}, [state.timerStatus.isTimerStart, state.timerStatus.isTimerPaused, state.timerStatus.seconds]);
+	}, [state.timerStatus.isTimerStart, state.timerStatus.isTimerPaused, state.timerStatus.secondsLeft]);
 
 	// Fetch timer from backend when page reload
 	useEffect(() => {
-		fetchTimer()
+		fetchTimer()           
 			.then(({ timerStatus }) => {
+        console.log(timerStatus)
 				dispatch({ type: ACTIONS.TIMER_SET, timerStatus });
 			})
 			.catch((err) => {
@@ -72,16 +82,16 @@ function Timer() {
 	}, []);
 
 	// Update backend timer when frontend timer change
-	useEffect(() => {
-		if (state.timerStatus.isTimerStart) {
-			fetchPutTimer(state.timerStatus).catch((err) => {
-				console.log(err);
-			});
-		}
-	}, [state.timerStatus]);
+	// useEffect(() => {
+	// 	if (state.timerStatus.isTimerStart) {
+	// 		fetchPutTimer(state.timerStatus).catch((err) => {
+	// 			console.log(err);
+	// 		});
+	// 	}
+	// }, [state.timerStatus]);
 
-	const minutes = Math.floor(state.timerStatus.seconds / 60);
-	const seconds = state.timerStatus.seconds % 60;
+	const minutes = Math.floor(state.timerStatus.secondsLeft / 60);
+	const seconds = state.timerStatus.secondsLeft % 60;
 	const formattedTime = `${minutes.toString().padStart(2, "0")}:${seconds
 		.toString()
 		.padStart(2, "0")}`;

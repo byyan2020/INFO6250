@@ -40,7 +40,7 @@ function reducer(state, action) {
 				...state,
 				timerStatus: {
 					...state.timerStatus,
-					seconds: state.timerStatus.seconds - 1,
+					secondsLeft: state.timerStatus.secondsLeft - 1,
 				},
 			};
 
@@ -50,7 +50,7 @@ function reducer(state, action) {
 				error: "",
 				timerStatus: {
 					...state.timerStatus,
-					seconds: TIMER_TIME.WORK,
+					secondsLeft: TIMER_TIME.WORK,
 					isTimerStart: true,
 					isTimerPaused: false,
 					isOnWorkSession: true,
@@ -63,7 +63,7 @@ function reducer(state, action) {
 				error: "",
 				timerStatus: {
 					...state.timerStatus,
-					seconds: TIMER_TIME.REST,
+					secondsLeft: TIMER_TIME.REST,
 					isTimerStart: true,
 					isTimerPaused: false,
 					isOnWorkSession: false,
@@ -96,7 +96,7 @@ function reducer(state, action) {
 				error: "",
 				timerStatus: {
 					...state.timerStatus,
-					seconds: TIMER_TIME.WORK,
+					secondsLeft: TIMER_TIME.WORK,
 					isTimerStart: false,
 					isTimerPaused: false,
 					isOnWorkSession: true,
