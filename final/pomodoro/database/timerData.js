@@ -12,6 +12,14 @@ const timer = {
 	},
 };
 
+function cal_seconds_left(userId) {
+  const currentTime = new Date().getTime()
+  const secondsPassed = Math.floor((currentTime - timer[userId].startTime) / 1000)
+  let secondsLeft = timer[userId].secondsLeft - secondsPassed
+  secondsLeft = 0 ? secondsLeft < 0 : secondsLeft 
+  return secondsLeft
+}
+
 function resetTimer(userId) {
   timer[userId] = {
     secondsLeft: 8,
@@ -55,11 +63,7 @@ function startRest(userId) {
 }
 
 function pauseTimer(userId) {
-  const currentTime = new Date().getTime()
-  console.log(new Date(currentTime), new Date(timer[userId].startTime))
-  const secondsPassed = Math.floor((currentTime - timer[userId].startTime) / 1000)
-  console.log(timer[userId].secondsLeft)
-  const secondsLeft = timer[userId].secondsLeft - secondsPassed
+  const secondsLeft = cal_seconds_left(userId)
   timer[userId] = {
     ...timer[userId],
     secondsLeft: secondsLeft,
@@ -82,31 +86,27 @@ function continueTimer(userId) {
 }
 
 function getTimer(userId) {
+  if (!(userId in timer)) {
+    return
+  }
+
   if (timer[userId].isTimerPaused || (!timer[userId].isTimerStart)) {
     console.log('get: ', timer[userId])
     return timer[userId]
   }
-  console.log('get_cal: ', timer[userId])
-  const currentTime = new Date().getTime()
-  const secondsPassed = Math.floor((currentTime - timer[userId].startTime) / 1000)
-  const secondsLeft = timer[userId].secondsLeft - secondsPassed
+  const secondsLeft = cal_seconds_left(userId)
   timer[userId] = {
     ...timer[userId],
     secondsLeft: secondsLeft
   }
+  console.log('get_cal: ', timer[userId])
 	return timer[userId];
 }
 
-function setTimer(userId, timerStatus) {
-	timer[userId] = timerStatus;
-  console.log('set: ', timer[userId])
-	return timer[userId];
-}
 
 module.exports = {
   resetTimer,
 	getTimer,
-	setTimer,
   startWork,
   startRest,
   pauseTimer,

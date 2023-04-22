@@ -83,15 +83,6 @@ function Timer() {
 			});
 	}, []);
 
-	// Update backend timer when frontend timer change
-	// useEffect(() => {
-	// 	if (state.timerState.isTimerStart) {
-	// 		fetchPutTimer(state.timerState).catch((err) => {
-	// 			console.log(err);
-	// 		});
-	// 	}
-	// }, [state.timerState]);
-
 	const minutes = Math.floor(state.timerState.secondsLeft / 60);
 	const seconds = state.timerState.secondsLeft % 60;
 	const formattedTime = `${minutes.toString().padStart(2, "0")}:${seconds

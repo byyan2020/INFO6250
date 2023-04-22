@@ -44,64 +44,64 @@ function reducer(state, action) {
 				},
 			};
 
-		case ACTIONS.TIMER_WORK_SESSION:
-			return {
-				...state,
-				error: "",
-				timerState: {
-					...state.timerState,
-					secondsLeft: TIMER_TIME.WORK,
-					isTimerStart: true,
-					isTimerPaused: false,
-					isOnWorkSession: true,
-				},
-			};
+		// case ACTIONS.TIMER_WORK_SESSION:
+		// 	return {
+		// 		...state,
+		// 		error: "",
+		// 		timerState: {
+		// 			...state.timerState,
+		// 			secondsLeft: TIMER_TIME.WORK,
+		// 			isTimerStart: true,
+		// 			isTimerPaused: false,
+		// 			isOnWorkSession: true,
+		// 		},
+		// 	};
 
-		case ACTIONS.TIMER_REST_SESSION:
-			return {
-				...state,
-				error: "",
-				timerState: {
-					...state.timerState,
-					secondsLeft: TIMER_TIME.REST,
-					isTimerStart: true,
-					isTimerPaused: false,
-					isOnWorkSession: false,
-				},
-			};
+		// case ACTIONS.TIMER_REST_SESSION:
+		// 	return {
+		// 		...state,
+		// 		error: "",
+		// 		timerState: {
+		// 			...state.timerState,
+		// 			secondsLeft: TIMER_TIME.REST,
+		// 			isTimerStart: true,
+		// 			isTimerPaused: false,
+		// 			isOnWorkSession: false,
+		// 		},
+		// 	};
 
-		case ACTIONS.TIMER_PAUSE:
-			return {
-				...state,
-				error: "",
-				timerState: {
-					...state.timerState,
-					isTimerPaused: true,
-				},
-			};
+		// case ACTIONS.TIMER_PAUSE:
+		// 	return {
+		// 		...state,
+		// 		error: "",
+		// 		timerState: {
+		// 			...state.timerState,
+		// 			isTimerPaused: true,
+		// 		},
+		// 	};
 
-		case ACTIONS.TIMER_CONTINUE:
-			return {
-				...state,
-				error: "",
-				timerState: {
-					...state.timerState,
-					isTimerPaused: false,
-				},
-			};
+		// case ACTIONS.TIMER_CONTINUE:
+		// 	return {
+		// 		...state,
+		// 		error: "",
+		// 		timerState: {
+		// 			...state.timerState,
+		// 			isTimerPaused: false,
+		// 		},
+		// 	};
 
-		case ACTIONS.TIMER_NOT_START:
-			return {
-				...state,
-				error: "",
-				timerState: {
-					...state.timerState,
-					secondsLeft: TIMER_TIME.WORK,
-					isTimerStart: false,
-					isTimerPaused: false,
-					isOnWorkSession: true,
-				},
-			};
+		// case ACTIONS.TIMER_NOT_START:
+		// 	return {
+		// 		...state,
+		// 		error: "",
+		// 		timerState: {
+		// 			...state.timerState,
+		// 			secondsLeft: TIMER_TIME.WORK,
+		// 			isTimerStart: false,
+		// 			isTimerPaused: false,
+		// 			isOnWorkSession: true,
+		// 		},
+		// 	};
 
 		// Alarm
 		case ACTIONS.SET_ALARM:

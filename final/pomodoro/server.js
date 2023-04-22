@@ -46,10 +46,12 @@ app.post("/api/session", (req, res) => {
 	}
 
 	const sid = sessions.addSession(username);
-  const userId = users.createUser(username)
+  const userId = users.getUserId(username) ? users.getUserId(username) : users.createUser(username)
 
   // Create default timer, alarm, record state
-  timerData.resetTimer(userId)
+  if (!timerData.getTimer(userId)){
+    timerData.resetTimer(userId)
+  }
   alarmData.createAlarm(userId)
 
 	res.cookie("sid", sid);

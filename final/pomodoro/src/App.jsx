@@ -27,9 +27,9 @@ function App() {
 				<AppContext.Provider value={{ state, dispatch }}>
 					<Error />
 					<Login/>
-					<Record/>
-					<Timer/>
-					<Alarm setTime={setTime} setIsRunning={setIsRunning} />
+					{state.isLoggedIn && <Record/>}
+					{state.isLoggedIn && <Timer/>}
+					{state.isLoggedIn && <Alarm/>}
 				</AppContext.Provider>
 			</main>
 		</div>
