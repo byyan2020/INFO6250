@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useContext } from "react";
-import { fetchLogin, fetchLogout, fetchSession } from "./services";
-import { CLIENT, ACTIONS } from "./constants";
+import { fetchLogin, fetchLogout, fetchPutTimer, fetchSession } from "./services";
+import { SERVER, ACTIONS, TIMER_STATUS } from "./constants";
 import AppContext from "./AppContext";
 
 function Login() {
-  const {state, dispatch} = useContext(AppContext)
+	const { state, dispatch } = useContext(AppContext);
 
-  const [tempUsername, setTempUsername] = useState('')
+	const [tempUsername, setTempUsername] = useState("");
 
-  function handleLogin(e) {
-    e.preventDefault();
+	function handleLogin(e) {
+		e.preventDefault();
 		fetchLogin(tempUsername)
 			.then(({ username }) => {
 				dispatch({ type: ACTIONS.LOG_IN, username });
@@ -21,10 +21,17 @@ function Login() {
 
 	function handleLogout() {
 		dispatch({ type: ACTIONS.LOG_OUT });
-		fetchLogout() 
+    // Reset timer when you log out
+		fetchPutTimer(TIMER_STATUS.RESET)
+			.then(({ timerState }) => {
+				dispatch({ type: ACTIONS.TIMER_SET, timerState });
+			})
 			.catch((err) => {
 				dispatch({ type: ACTIONS.REPORT_ERROR, error: err?.error });
 			});
+		fetchLogout().catch((err) => {
+			dispatch({ type: ACTIONS.REPORT_ERROR, error: err?.error });
+		});
 	}
 
 	function checkForSession() {
@@ -35,7 +42,7 @@ function Login() {
 				return username;
 			})
 			.catch((err) => {
-				if (err?.error === CLIENT.NO_SESSION) {
+				if (err?.error === SERVER.AUTH_MISSING) {
 					dispatch({ type: ACTIONS.LOG_OUT });
 					return;
 				}

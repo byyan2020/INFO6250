@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
-import { ACTIONS, TIMER_TIME } from "./constants";
-import { fetchAlarm, fetchPutAlarm, fetchPutTimer } from "./services";
+import { ACTIONS, TIMER_STATUS } from "./constants";
+import { fetchAlarm, fetchPutAlarm, fetchPutTimer, fetchDeleteAlarm } from "./services";
 import AppContext from "./AppContext";
 
 function Alarm() {
@@ -16,18 +16,18 @@ function Alarm() {
 	const handleSetAlarm = (e) => {
 		e.preventDefault();
 		let inputTime = e.target.elements.alarmTime.value;
-		fetchPutAlarm(inputTime, true)
-			.then((alarmStatus) => {
-				dispatch({ type: ACTIONS.SET_ALARM, alarmStatus });
+		fetchPutAlarm(inputTime)
+			.then(({ alarmState }) => {
+				dispatch({ type: ACTIONS.SET_ALARM, alarmState });
 			})
 			.catch((err) => console.log(err));
 	};
 
-	const handleCancelAlarm = (event) => {
-		event.preventDefault();
-		fetchPutAlarm(null, false)
-			.then((alarmStatus) => {
-				dispatch({ type: ACTIONS.SET_ALARM, alarmStatus });
+	const handleCancelAlarm = (e) => {
+		e.preventDefault();
+		fetchDeleteAlarm()
+			.then((alarmState) => {
+				dispatch({ type: ACTIONS.SET_ALARM, alarmState });
 			})
 			.catch((err) => console.log(err));
 	};
@@ -36,37 +36,37 @@ function Alarm() {
 	useEffect(() => {
 		const checkAlarm = (currentTime) => {
 			const date = new Date();
-			const alarmDate = new Date(date.toDateString() + " " + state.alarmStatus.alarmTime);
+			const alarmDate = new Date(date.toDateString() + " " + state.alarmState.alarmTime);
 			const currentDate = new Date(date.toDateString() + " " + currentTime);
 			if (alarmDate.getTime() === currentDate.getTime()) {
-				fetchPutAlarm(null, false)
-					.then((alarmStatus) => {
-						dispatch({ type: ACTIONS.SET_ALARM, alarmStatus });
+				fetchPutTimer(TIMER_STATUS.WORK)
+					.then(({ timerState }) => {
+						dispatch({ type: ACTIONS.TIMER_SET, timerState });
+						return fetchDeleteAlarm();
 					})
-					.catch((err) => console.log(err));
-				// TODO first set frontend then send data to backend?
-				dispatch({ type: ACTIONS.TIMER_WORK_SESSION });
-				fetchPutTimer(state.timerStatus)
-					.then((timerStatus) => {
-						dispatch({ type: ACTIONS.TIMER_WORK_SESSION });
+					.catch((err) => Promise.reject(err))
+					.then((alarmState) => {
+						dispatch({ type: ACTIONS.SET_ALARM, alarmState });
 					})
 					.catch((err) => console.log(err));
 			}
 		};
 
-		const timer = setInterval(() => {
-			const currentTime = getCurrentTime();
-			setCurrentTime(currentTime);
-			checkAlarm(currentTime);
-		}, 1000);
+		if (state.alarmState.isAlarmOn) {
+			const timer = setInterval(() => {
+				const currentTime = getCurrentTime();
+				setCurrentTime(currentTime);
+				checkAlarm(currentTime);
+			}, 1000);
 
-		return () => clearInterval(timer);
-	}, [state.alarmStatus.alarmTime]);
+			return () => clearInterval(timer);
+		}
+	}, [state.alarmState.alarmTime]);
 
 	useEffect(() => {
 		fetchAlarm()
-			.then((alarmStatus) => {
-				dispatch({ type: ACTIONS.SET_ALARM, alarmStatus });
+			.then(({ alarmState }) => {
+				dispatch({ type: ACTIONS.SET_ALARM, alarmState });
 			})
 			.catch((err) => console.log(err));
 	}, []);
@@ -77,10 +77,10 @@ function Alarm() {
 			<p>The current time is: {currentTime}</p>
 			<form onSubmit={handleSetAlarm}>
 				<label htmlFor="alarmTime">Schedule time to start Pomodoro timer:</label>
-				<input type="time" id="alarmTime" name="alarmTime" value={state.alarmStatus.alarmTime} />
+				<input type="time" id="alarmTime" name="alarmTime" value={state.alarmState.alarmTime} />
 				<button type="submit">Set</button>
 			</form>
-			{state.alarmStatus.isAlarmOn && (
+			{state.alarmState.isAlarmOn && (
 				<form onSubmit={handleCancelAlarm}>
 					<button type="submit">Cancel</button>
 				</form>

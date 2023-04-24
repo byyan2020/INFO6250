@@ -5,8 +5,8 @@ export const initialState = {
 	username: "",
 	isLoggedIn: false,
 	timerState: {},
-	alarmStatus: {},
-	count: 0,
+	alarmState: {},
+	recordState: {},
 };
 
 function reducer(state, action) {
@@ -44,84 +44,34 @@ function reducer(state, action) {
 				},
 			};
 
-		// case ACTIONS.TIMER_WORK_SESSION:
-		// 	return {
-		// 		...state,
-		// 		error: "",
-		// 		timerState: {
-		// 			...state.timerState,
-		// 			secondsLeft: TIMER_TIME.WORK,
-		// 			isTimerStart: true,
-		// 			isTimerPaused: false,
-		// 			isOnWorkSession: true,
-		// 		},
-		// 	};
-
-		// case ACTIONS.TIMER_REST_SESSION:
-		// 	return {
-		// 		...state,
-		// 		error: "",
-		// 		timerState: {
-		// 			...state.timerState,
-		// 			secondsLeft: TIMER_TIME.REST,
-		// 			isTimerStart: true,
-		// 			isTimerPaused: false,
-		// 			isOnWorkSession: false,
-		// 		},
-		// 	};
-
-		// case ACTIONS.TIMER_PAUSE:
-		// 	return {
-		// 		...state,
-		// 		error: "",
-		// 		timerState: {
-		// 			...state.timerState,
-		// 			isTimerPaused: true,
-		// 		},
-		// 	};
-
-		// case ACTIONS.TIMER_CONTINUE:
-		// 	return {
-		// 		...state,
-		// 		error: "",
-		// 		timerState: {
-		// 			...state.timerState,
-		// 			isTimerPaused: false,
-		// 		},
-		// 	};
-
-		// case ACTIONS.TIMER_NOT_START:
-		// 	return {
-		// 		...state,
-		// 		error: "",
-		// 		timerState: {
-		// 			...state.timerState,
-		// 			secondsLeft: TIMER_TIME.WORK,
-		// 			isTimerStart: false,
-		// 			isTimerPaused: false,
-		// 			isOnWorkSession: true,
-		// 		},
-		// 	};
+		case ACTIONS.TIMER_DURATION:
+			return {
+				...state,
+				timerState: {
+					...state.timerState,
+					workDuration: action.workDuration,
+					restDuration: action.restDuration,
+				},
+			};
 
 		// Alarm
 		case ACTIONS.SET_ALARM:
 			return {
 				...state,
-				alarmStatus: action.alarmStatus,
+				alarmState: action.alarmState,
 			};
 
 		// Record
-		case ACTIONS.RECORD_INCREMENT:
+		case ACTIONS.SET_RECORD:
 			return {
 				...state,
-				count: state.count + 1,
+				recordState: action.recordState,
 			};
 
 		case ACTIONS.REPORT_ERROR:
-			// We could move the "pick the message" logic from Status.jsx here. Better? It depends.
 			return {
 				...state,
-				error: action.error || "ERROR", // ERROR is just to ensure a truthy value
+				error: action.error || "ERROR",
 			};
 
 		default:

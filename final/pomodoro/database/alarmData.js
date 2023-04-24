@@ -14,25 +14,31 @@ const alarm = {
 	},
 };
 
-function createAlarm(userId) {
+function resetAlarm(userId) {
 	alarm[userId] = {
 		alarmTime: null,
-		isAlarmOn: true,
+		isAlarmOn: false,
 	};
-  return alarm[userId]
-}
-
-function getAlarm(userId) {
 	return alarm[userId];
 }
 
-function setAlarm(userId, alarmStatus) {
-	alarm[userId] = alarmStatus;
+function getAlarm(userId) {
+	if (!(userId in alarm)) {
+		return;
+	}
+	return alarm[userId];
+}
+
+function setAlarm(userId, alarmTime) {
+	alarm[userId] = {
+		alarmTime: alarmTime,
+		isAlarmOn: true,
+	};
 	return alarm[userId];
 }
 
 module.exports = {
-  createAlarm,
+	resetAlarm,
 	getAlarm,
 	setAlarm,
 };

@@ -37,15 +37,12 @@ export const ACTIONS = {
 
   TIMER_SET: 'timerSet',
   TIMER_DECREMENT: 'timerDecrement',
-  TIMER_WORK_SESSION: 'timerWorkSession',
-  TIMER_REST_SESSION: 'timerRestSession',
-  TIMER_PAUSE: 'timerPause',
-  TIMER_CONTINUE: 'timerContinue',
-  TIMER_NOT_START: 'timerNotStart',
+  TIMER_DURATION: 'timerDuration',
 
   SET_ALARM: 'setAlarm',
 
   RECORD_INCREMENT: 'recordIncrement',
+  SET_RECORD: 'setRecord',
   
   REPORT_ERROR: 'reportError'
 };

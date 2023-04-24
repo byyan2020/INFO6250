@@ -1,13 +1,9 @@
-import { useEffect, useState } from "react";
-import { ACTIONS, TIMER_STATUS, TIMER_TIME } from "./constants";
+import { useEffect } from "react";
+import { ACTIONS, TIMER_STATUS } from "./constants";
 import {
 	fetchPutTimer,
 	fetchTimer,
-	fetchTimerContinue,
-	fetchTimerPause,
-	fetchTimerReset,
-  fetchTimerRest,
-	fetchTimerWork,
+  fetchPutRecord
 } from "./services";
 import { useContext } from "react";
 import AppContext from "./AppContext";
@@ -53,19 +49,27 @@ function Timer() {
 		});
 	};
 
-	// Change timer every second
 	useEffect(() => {
+    // Change timer every second
 		if (state.timerState.isTimerStart && !state.timerState.isTimerPaused) {
 			const timer = setInterval(() => {
 				dispatch({ type: ACTIONS.TIMER_DECREMENT });
 			}, 1000);
+      // Change timer from work session to rest session
 			if (state.timerState.secondsLeft === 0 && state.timerState.isOnWorkSession) {
 				fetchPutTimer(TIMER_STATUS.REST).then(({ timerState }) => dispatch({ type: ACTIONS.TIMER_SET, timerState }));
+      // Change timer from rest session to work session
 			} else if (state.timerState.secondsLeft === 0 && !state.timerState.isOnWorkSession) {
         fetchPutTimer(TIMER_STATUS.WORK).then(({ timerState }) => {
           dispatch({ type: ACTIONS.TIMER_SET, timerState });
-        });
-				dispatch({ type: ACTIONS.RECORD_INCREMENT });
+          // Increment the record count when one circle finished
+          return fetchPutRecord(state.recordState.count + 1)
+        })
+        .catch(err => Promise.reject(err))
+        .then(({recordState}) => {
+          dispatch({ type: ACTIONS.SET_RECORD, recordState });
+        })
+        .catch(err => console.log(err))
 			}
 			return () => clearInterval(timer);
 		}
@@ -75,7 +79,6 @@ function Timer() {
 	useEffect(() => {
 		fetchTimer()           
 			.then(({ timerState }) => {
-        console.log(timerState)
 				dispatch({ type: ACTIONS.TIMER_SET, timerState });
 			})
 			.catch((err) => {
