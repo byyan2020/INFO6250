@@ -26,8 +26,8 @@ function TimerDuration() {
 	}
 
 	return (
-		<div>
-			<h2>Set Timer Duration</h2>
+		<div class="set-timer">
+			<h2 class="set-timer-heading">Set Timer Duration</h2>
 			<form onSubmit={handleSetTimeDuration}>
 				<label>
 					Set work duration (minutes):
@@ -37,6 +37,7 @@ function TimerDuration() {
 						step="1"
 						value={workDuration}
 						onChange={(e) => setWorkDuration(e.target.value)}
+            class="work-duration"
 					/>
 				</label>
 				<label>
@@ -47,6 +48,7 @@ function TimerDuration() {
 						step="1"
 						value={restDuration}
 						onChange={(e) => setRestDuration(e.target.value)}
+            class="rest-duration"
 					/>
 				</label>
 				<button type="submit" className="form-btn">

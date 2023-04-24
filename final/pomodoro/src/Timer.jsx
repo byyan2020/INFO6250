@@ -93,9 +93,9 @@ function Timer() {
 		.padStart(2, "0")}`;
 
 	return (
-		<>
-			<h2>Timer</h2>
-			<div>Timer: {formattedTime}</div>
+		<div className="timer">
+			<h2 className="timer-heading">Timer</h2>
+			<p className="timer-message">Timer: {formattedTime}</p>
 			{state.timerState.isTimerStart && (
 				<p>
 					{!state.timerState.isOnWorkSession
@@ -104,21 +104,21 @@ function Timer() {
 				</p>
 			)}
 			{state.timerState.isTimerStart && (
-				<button onClick={handlePause}>
+				<button onClick={handlePause} className="btn">
 					{state.timerState.isTimerPaused ? "Continue" : "Pause"}
 				</button>
 			)}
 			{!state.timerState.isTimerStart && (
-				<button onClick={handleWork}>Start a new work cycle</button>
+				<button onClick={handleWork} className="btn">Start a new work cycle</button>
 			)}
 			{state.timerState.isTimerStart && !state.timerState.isOnWorkSession && (
-				<button onClick={handleWork}>Start a new work cycle</button>
+				<button onClick={handleWork} className="btn">Start a new work cycle</button>
 			)}
 			{state.timerState.isTimerStart && state.timerState.isOnWorkSession && (
-				<button onClick={handleRest}>Skip to rest</button>
+				<button onClick={handleRest} className="btn">Skip to rest</button>
 			)}
-			{state.timerState.isTimerStart && <button onClick={handleCancleTimer}>Cancle Timer</button>}
-		</>
+			{state.timerState.isTimerStart && <button onClick={handleCancleTimer} className="btn">Cancle Timer</button>}
+		</div>
 	);
 }
 

@@ -73,16 +73,16 @@ function Alarm() {
 
 	return (
 		<div className="alarm">
-			<h2>Alarm</h2>
-			<p>The current time is: {currentTime}</p>
-			<form onSubmit={handleSetAlarm}>
+			<h2 class="alarm-heading">Alarm</h2>
+			<p class="alarm-message">The current time is: {currentTime}</p>
+			<form className="alarm-form" onSubmit={handleSetAlarm}>
 				<label htmlFor="alarmTime">Schedule time to start Pomodoro timer:</label>
-				<input type="time" id="alarmTime" name="alarmTime" value={state.alarmState.alarmTime} />
-				<button type="submit">Set</button>
+				<input type="time" id="alarmTime" name="alarmTime" value={state.alarmState.alarmTime} className="alarm-input"/>
+				<button type="submit" className="btn">Set</button>
 			</form>
 			{state.alarmState.isAlarmOn && (
 				<form onSubmit={handleCancelAlarm}>
-					<button type="submit">Cancel</button>
+					<button type="submit" className="btn">Cancel</button>
 				</form>
 			)}
 		</div>

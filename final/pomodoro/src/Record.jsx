@@ -16,9 +16,9 @@ function Record() {
   },[])
 
   return (
-    <div>
-      <h2>Record</h2>
-      You have completed {state.recordState.count} cycles
+    <div className="record">
+      <h2 className="record-heading">Record</h2>
+      <p className="record-message">You have completed {state.recordState.count} cycles</p> 
     </div>
   )
 }

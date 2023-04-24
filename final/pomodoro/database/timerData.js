@@ -42,7 +42,6 @@ function createTimer(userId) {
 		workDuration: 25 * 60,
 		restDuration: 5 * 60,
 	};
-	console.log("create: ", timer[userId]);
 	return timer[userId];
 }
 
@@ -55,7 +54,6 @@ function resetTimer(userId) {
 		isTimerPaused: false,
 		isOnWorkSession: false,
 	};
-	console.log("reset: ", timer[userId]);
 	return timer[userId];
 }
 
@@ -69,7 +67,6 @@ function startWork(userId) {
 		isTimerStart: true,
 		isOnWorkSession: true,
 	};
-	console.log("work: ", timer[userId]);
 	return timer[userId];
 }
 
@@ -83,7 +80,6 @@ function startRest(userId) {
 		isTimerStart: true,
 		isOnWorkSession: false,
 	};
-	console.log("rest: ", timer[userId]);
 	return timer[userId];
 }
 
@@ -95,7 +91,6 @@ function pauseTimer(userId) {
 		startTime: null,
 		isTimerPaused: true,
 	};
-	console.log("pause: ", timer[userId]);
 	return timer[userId];
 }
 
@@ -106,7 +101,6 @@ function continueTimer(userId) {
 		startTime: startTime,
 		isTimerPaused: false,
 	};
-	console.log("continue: ", timer[userId]);
 	return timer[userId];
 }
 
@@ -116,7 +110,6 @@ function getTimer(userId) {
 	}
 
 	if (timer[userId].isTimerPaused || !timer[userId].isTimerStart) {
-		console.log("get: ", timer[userId]);
 		return timer[userId];
 	}
 	const secondsLeft = cal_seconds_left(userId);
@@ -124,7 +117,6 @@ function getTimer(userId) {
 		...timer[userId],
 		secondsLeft: secondsLeft,
 	};
-	console.log("get_cal: ", timer[userId]);
 	return timer[userId];
 }
 

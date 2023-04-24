@@ -56,10 +56,10 @@ function Login() {
 
 	return (
 		<div className="login">
-			<h2>User</h2>
+			<h2 className="login-heading">User</h2>
 			{state.isLoggedIn ? (
 				<div className="logout">
-					Hello {state.username}
+					<p className="greeting">Hello {state.username}</p> 
 					<button onClick={handleLogout} className="logout-btn">
 						Logout
 					</button>
